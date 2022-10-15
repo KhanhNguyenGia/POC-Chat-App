@@ -1,11 +1,12 @@
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/auth.context';
 import { ChatContext } from '../../context/chat.context';
 import {
 	checkChatExists,
 	createNewChat,
 	db,
+	searchUser,
 	sendMessage,
 	uploadFiles,
 } from '../../utils/firebase/firebase.utils';
@@ -14,6 +15,7 @@ import ChatList from '../chat-list/chat-list.component';
 import ChatMain from '../chat-main/chat-main.component';
 import NewChatOverlay from '../new-chat-overlay/new-chat-overlay.component';
 import { uuidv4 } from '@firebase/util';
+import _, { debounce } from 'lodash';
 
 const MAX_SIZE = 1000000;
 
@@ -27,10 +29,26 @@ const Chat = () => {
 	const [openNewChat, setOpenNewChat] = useState(false);
 	const [isDragged, setIsDragged] = useState(false);
 	const [files, setFiles] = useState([]);
+	const [found, setFound] = useState([]);
+
+	const onNewChatId = (e) => {
+		setNewChatId(e.target.value);
+		onSearchDebounce(e.target.value);
+	};
 
 	const onChange = (e) => {
 		setMessage(e.target.value);
 	};
+
+	const onSearch = async (value) => {
+		const found = await searchUser(value);
+		setFound(found);
+	};
+
+	const onSearchDebounce = useCallback(
+		debounce((value) => onSearch(value), 500),
+		[]
+	);
 
 	const onSendMessage = async (e) => {
 		e.preventDefault();
@@ -46,7 +64,6 @@ const Chat = () => {
 					ref: await uploadFiles(chat, file),
 				}))
 			));
-		console.log(fileRefs);
 		const fileURL =
 			fileRefs.length &&
 			fileRefs.map((fileRef) => ({
@@ -61,11 +78,11 @@ const Chat = () => {
 		setSending(false);
 	};
 
-	const onNewChat = async (e) => {
-		e.preventDefault();
-		if (!(await checkChatExists(user.uid, newChatId)) && user.uid !== newChatId) {
-			await createNewChat(user, newChatId);
+	const onNewChat = async (newChat) => {
+		if (!(await checkChatExists(user.email, newChat)) && user.email !== newChat) {
+			await createNewChat(user, newChat);
 		}
+		setFound([]);
 		setNewChatId('');
 		setOpenNewChat(false);
 	};
@@ -76,7 +93,7 @@ const Chat = () => {
 
 	useEffect(() => {
 		const unsubscribeFromChatList = onSnapshot(
-			query(collection(db, `/chats`), where('membersId', 'array-contains', `${user.uid}`)),
+			query(collection(db, `/chats`), where('membersId', 'array-contains', `${user.email}`)),
 			(docs) => {
 				setChats(
 					docs.docs.map((doc) => ({
@@ -142,7 +159,7 @@ const Chat = () => {
 					<div
 						style={{
 							flex: 3,
-							maxHeight: '700px',
+							height: '700px',
 							background: '#222',
 							display: 'flex',
 							justifyContent: 'center',
@@ -155,26 +172,31 @@ const Chat = () => {
 							gap: 10,
 						}}
 					>
-						{chat && <ChatMain chat={chat} />}
-						<ChatInput
-							message={message}
-							onChange={onChange}
-							onSendMessage={onSendMessage}
-							disabled={sending}
-							files={files}
-							onRemove={onRemove}
-						/>
+						{chat && (
+							<>
+								<ChatMain chat={chat} />
+								<ChatInput
+									message={message}
+									onChange={onChange}
+									onSendMessage={onSendMessage}
+									disabled={sending}
+									files={files}
+									onRemove={onRemove}
+								/>
+							</>
+						)}
 					</div>
 				</div>
-				{openNewChat && (
-					<NewChatOverlay
-						newChatId={newChatId}
-						setNewChatId={setNewChatId}
-						setOpenNewChat={setOpenNewChat}
-						onNewChat={onNewChat}
-					/>
-				)}
 			</main>
+			{openNewChat && (
+				<NewChatOverlay
+					newChatId={newChatId}
+					onNewChatId={onNewChatId}
+					setOpenNewChat={setOpenNewChat}
+					onNewChat={onNewChat}
+					found={found}
+				/>
+			)}
 			{isDragged && (
 				<div
 					style={{

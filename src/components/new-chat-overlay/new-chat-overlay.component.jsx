@@ -1,4 +1,4 @@
-const NewChatOverlay = ({ setOpenNewChat, setNewChatId, newChatId, onNewChat }) => {
+const NewChatOverlay = ({ setOpenNewChat, onNewChatId, newChatId, onNewChat, found }) => {
 	return (
 		<div
 			style={{
@@ -27,11 +27,23 @@ const NewChatOverlay = ({ setOpenNewChat, setNewChatId, newChatId, onNewChat }) 
 					color: '#fff',
 				}}
 				onClick={(e) => e.stopPropagation()}
-				onSubmit={onNewChat}
 			>
 				<label>New chat ID</label>
-				<input value={newChatId} onChange={(e) => setNewChatId(e.target.value)} />
-				<button type='submit'>Create</button>
+				<input value={newChatId} onChange={onNewChatId} />
+				{!!found?.length && (
+					<div style={{ display: 'flex', flexFlow: 'column', gap: 10 }}>
+						{found.map((_) => (
+							<button
+								key={_.email}
+								type='button'
+								onClick={() => onNewChat(_.email)}
+								style={{ background: '#fff', padding: '8px 12px', cursor: 'pointer' }}
+							>
+								{_.email}
+							</button>
+						))}
+					</div>
+				)}
 			</form>
 		</div>
 	);

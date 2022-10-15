@@ -16,12 +16,22 @@ const ChatListItem = ({ id, member }) => {
 				gap: 20,
 				borderRadius: 4,
 				cursor: 'pointer',
+				alignItems: 'center',
 			}}
 		>
-			<img src={member.photoURL} alt='avatar' height={40} style={{ borderRadius: '50%' }} />
-			<span style={{ textOverflow: 'ellipsis', maxWidth: '100%' }}>
-				{member.displayName.toUpperCase()}
-			</span>
+			{/* <div
+				style={{
+					background: '#002d96',
+					width: 40,
+					height: 40,
+					display: 'grid',
+					placeItems: 'center',
+					borderRadius: 9999,
+				}}
+			>
+				{member.email.charAt(0).toUpperCase()}
+			</div> */}
+			<span style={{ overflow: 'hidden' }}>{member.email.toUpperCase()}</span>
 		</div>
 	);
 };
@@ -38,6 +48,7 @@ const ChatList = ({ onNewChat, chats }) => {
 				padding: 10,
 				flex: 1,
 				gap: 20,
+				maxWidth: '30%',
 			}}
 		>
 			<button onClick={() => onNewChat(true)}>New chat</button>

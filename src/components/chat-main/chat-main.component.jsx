@@ -40,6 +40,7 @@ const ChatMain = ({ chat }) => {
 					borderRadius: 4,
 					display: 'flex',
 					flexFlow: 'column',
+					justifyContent: 'flex-end',
 					overflow: 'auto',
 					padding: 10,
 					gap: 5,

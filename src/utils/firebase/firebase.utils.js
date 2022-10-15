@@ -10,7 +10,14 @@ import {
 	setDoc,
 	where,
 } from 'firebase/firestore';
-import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
+import {
+	getAuth,
+	signInWithPopup,
+	signOut,
+	GoogleAuthProvider,
+	signInWithEmailAndPassword,
+	createUserWithEmailAndPassword,
+} from 'firebase/auth';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -31,9 +38,35 @@ const googleProvider = new GoogleAuthProvider();
 export const googlePopup = async () => {
 	try {
 		const { user } = await signInWithPopup(auth, googleProvider);
-		const userRef = doc(db, `/users/${user.uid}`);
-		const { uid, email, displayName, photoURL } = user;
-		await setDoc(userRef, { uid, email, displayName, photoURL });
+		const userRef = doc(db, `/users/${user.email}`);
+		const { uid, email } = user;
+		const userDoc = await getDoc(userRef);
+		if (userDoc.exists()) return;
+		await setDoc(userRef, { uid, email });
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const signInWithEmail = async (email, password) => {
+	if (!email || !password) return;
+	try {
+		const { user } = await signInWithEmailAndPassword(auth, email, password);
+		const userRef = doc(db, `/users/${user.email}`);
+		const userDoc = await getDoc(userRef);
+		if (userDoc.exists()) return;
+		await setDoc(userRef, { uid: user.uid, email: user.email });
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const signUp = async (email, password) => {
+	if (!email || !password) return;
+	try {
+		const { user } = await createUserWithEmailAndPassword(auth, email, password);
+		const userRef = doc(db, `/users/${user.email}`);
+		await setDoc(userRef, { uid: user.uid, email: user.email });
 	} catch (e) {
 		console.log(e);
 	}
@@ -53,29 +86,29 @@ export const sendMessage = async (message, fileURL, uid, chatId) => {
 	}
 };
 
-export const findUser = async (otherUid) => {
-	if (!otherUid) return;
-	const userRef = doc(db, `/users/${otherUid}`);
+export const findUser = async (otherEmail) => {
+	if (!otherEmail) return;
+	const userRef = doc(db, `/users/${otherEmail}`);
 	const result = await getDoc(userRef);
 	return result.data();
 };
 
-export const checkChatExists = async (currentUid, otherUid) => {
+export const checkChatExists = async (currentEmail, otherEmail) => {
 	const chatRef = collection(db, `/chats`);
-	const q = query(chatRef, where('membersId', 'in', [[currentUid, otherUid]]));
+	const q = query(chatRef, where('membersId', 'in', [[currentEmail, otherEmail]]));
 	const results = await getDocs(q);
 	return results.size;
 };
 
-export const createNewChat = async (current, otherUid) => {
-	const other = await findUser(otherUid);
+export const createNewChat = async (current, otherEmail) => {
+	const other = await findUser(otherEmail);
 	if (!current || !other) return;
 	try {
-		const { uid, photoURL, displayName, email } = current;
+		const { uid, email } = current;
 		const chatRef = collection(db, `/chats`);
 		await addDoc(chatRef, {
-			membersId: [current.uid, other.uid],
-			members: [{ uid, photoURL, displayName, email }, other],
+			membersId: [current.email, other.email],
+			members: [{ uid, email }, other],
 		});
 	} catch (e) {
 		console.log(e);
@@ -87,4 +120,13 @@ export const uploadFiles = async (chatId, file) => {
 	const fileRef = ref(storage, `/chats/${chatId}/${file.uuid}`);
 	const snapshot = uploadBytes(fileRef, file.file);
 	return snapshot;
+};
+
+export const searchUser = async (email) => {
+	if (!email) return;
+	const userRef = collection(db, '/users');
+	const result = await getDocs(userRef);
+	if (result.empty) return;
+	const docs = await Promise.all(result.docs.map((doc) => doc.data()));
+	return docs.filter((doc) => doc.email.includes(email));
 };
