@@ -1,21 +1,7 @@
 import { useContext } from 'react';
 import { AuthContext } from '../../context/auth.context';
-import { ChatContext, CHAT_ACTION_TYPES } from '../../context/chat.context';
+import { CHAT_ACTION_TYPES } from '../../context/chat.context';
 import Button from '../button/button.component';
-
-// const BACKGROUND_POS = {
-// 	1: 'center',
-// 	2: 'left center, right center',
-// 	3: 'left top, right top, center bottom',
-// 	4: 'left top, right top, left bottom, right bottom',
-// };
-
-// const BACKGROUND_SIZE = {
-// 	1: '40px',
-// 	2: '20px 40px',
-// 	3: '20px 20px, 20px 20px, 40px 20px',
-// 	4: '20px',
-// };
 
 const AVA_SIZE = 50;
 
@@ -181,9 +167,6 @@ const Avatar = ({ members }) => {
 };
 
 const ChatListItem = ({ id, members }) => {
-	const { dispatch } = useContext(ChatContext);
-	// const backgroundPos = BACKGROUND_POS[members.length] || BACKGROUND_POS[4];
-	// const backgroundSize = BACKGROUND_SIZE[members.length] || BACKGROUND_POS[4];
 	const names = members.map((member) => member.email.split('@')[0].slice(0, 8)).join(', ');
 	return (
 		<div
@@ -192,14 +175,6 @@ const ChatListItem = ({ id, members }) => {
 			}}
 			className='flex flex-row gap-4 cursor-pointer rounded-lg p-2 items-center overflow-hidden bg-[#333] md:w-full hover:bg-action'
 		>
-			{/* <div
-				className='min-h-[40px] min-w-[40px] w-[40px] h-[40px] bg-no-repeat rounded-full'
-				style={{
-					backgroundImage: members.map(({ photoURL }) => `url(${photoURL})`).join(','),
-					backgroundSize: backgroundSize,
-					backgroundPosition: backgroundPos,
-				}}
-			></div> */}
 			<Avatar members={members} />
 			<div className='hidden text-text md:inline truncate'>{names}</div>
 		</div>

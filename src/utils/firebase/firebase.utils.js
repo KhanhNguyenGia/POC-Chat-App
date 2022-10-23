@@ -103,14 +103,6 @@ export const sendMessage = async (message, fileURL, uid, chatId) => {
 	}
 };
 
-// export const findUser = async (otherEmail) => {
-// 	if (!otherEmail) return;
-// 	const userRef = collection(db, `/users`);
-// 	const q = query(userRef, where('email', '==', otherEmail));
-// 	const result = await getDoc(q);
-// 	return result.data();
-// };
-
 export const checkChatExists = async (current, other) => {
 	const chatRef = collection(db, `/chats`);
 	const q = query(
