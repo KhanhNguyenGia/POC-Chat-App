@@ -1,4 +1,4 @@
-const DEFAULT_STYLE = 'rounded-lg text-text px-3 py-2 w-max';
+const DEFAULT_STYLE = 'rounded-lg text-text px-3 py-2';
 
 const ChatBubble = ({ current, children, belongsTo, same }) => {
 	const STYLE = `${DEFAULT_STYLE} ${
