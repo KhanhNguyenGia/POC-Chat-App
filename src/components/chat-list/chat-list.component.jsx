@@ -35,6 +35,7 @@ const Avatar = ({ members }) => {
 					{members.map((member) =>
 						member.photoURL ? (
 							<img
+								key={member.email}
 								src={member.photoURL}
 								alt={member.email}
 								className={`object-center object-cover`}
@@ -45,6 +46,7 @@ const Avatar = ({ members }) => {
 							/>
 						) : (
 							<div
+								key={member.email}
 								className={`text-text font-medium text-4xl flex justify-center items-center`}
 								style={{
 									background: `#${Math.floor(Math.random() * 999999 + 1)}`,
@@ -72,6 +74,7 @@ const Avatar = ({ members }) => {
 					{members.map((member) =>
 						member.photoURL ? (
 							<img
+								key={member.email}
 								src={member.photoURL}
 								alt={member.email}
 								className={`object-center object-cover`}
@@ -82,6 +85,7 @@ const Avatar = ({ members }) => {
 							/>
 						) : (
 							<div
+								key={member.email}
 								className={`text-text font-medium text-2xl flex justify-center items-center`}
 								style={{
 									background: `#${Math.floor(Math.random() * 999999 + 1)}`,
@@ -109,6 +113,7 @@ const Avatar = ({ members }) => {
 					{members.map((member, index) =>
 						member.photoURL ? (
 							<img
+								key={member.email}
 								src={member.photoURL}
 								alt={member.email}
 								className={`object-center object-cover`}
@@ -119,6 +124,7 @@ const Avatar = ({ members }) => {
 							/>
 						) : (
 							<div
+								key={member.email}
 								className={`text-text font-medium text-xl flex justify-center items-center`}
 								style={{
 									background: `#${Math.floor(Math.random() * 999999 + 1)}`,
@@ -146,6 +152,7 @@ const Avatar = ({ members }) => {
 					{members.map((member) =>
 						member.photoURL ? (
 							<img
+								key={member.email}
 								src={member.photoURL}
 								alt={member.email}
 								className={`object-center object-cover`}
@@ -156,6 +163,7 @@ const Avatar = ({ members }) => {
 							/>
 						) : (
 							<div
+								key={member.email}
 								className={`text-text font-medium text-xl flex justify-center items-center`}
 								style={{
 									background: `#${Math.floor(Math.random() * 999999 + 1)}`,

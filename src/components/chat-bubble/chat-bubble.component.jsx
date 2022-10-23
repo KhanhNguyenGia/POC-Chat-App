@@ -13,11 +13,17 @@ const ChatBubble = ({ current, children, belongsTo, same }) => {
 		>
 			{!current && !same && (
 				<div>
-					<img
-						src={belongsTo.photoURL}
-						className='min-w-[40px] max-w-[40px] min-h-[40px] max-h-[40px] object-cover object-center rounded-full'
-						alt={belongsTo.email}
-					/>
+					{belongsTo.photoURL ? (
+						<img
+							src={belongsTo.photoURL}
+							className='min-w-[40px] max-w-[40px] min-h-[40px] max-h-[40px] object-cover object-center rounded-full'
+							alt={belongsTo.email}
+						/>
+					) : (
+						<div className='min-w-[40px] max-w-[40px] min-h-[40px] max-h-[40px] object-cover object-center rounded-full bg-action text-text font-medium text-2xl flex justify-center items-center'>
+							{belongsTo.email.charAt(0).toUpperCase()}
+						</div>
+					)}
 				</div>
 			)}
 			<div className={STYLE} style={{ wordWrap: 'break-word' }}>
