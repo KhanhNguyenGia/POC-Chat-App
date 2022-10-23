@@ -13,8 +13,8 @@ const Button = ({
 }) => {
 	return (
 		<button
-			className={`bg-${
-				BUTTON_TYPES[color] || 'primary'
+			className={`${
+				BUTTON_TYPES[color] ? `bg-${BUTTON_TYPES[color]}` : 'bg-primary'
 			} flex-1 px-5 py-2 rounded-md text-text text-md font-medium hover:bg-action transition-all ${className}`}
 			type={type}
 			{...rest}

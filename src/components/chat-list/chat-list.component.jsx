@@ -1,6 +1,7 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
+import ReactTimeAgo from 'react-time-ago';
 import { AuthContext } from '../../context/auth.context';
-import { CHAT_ACTION_TYPES } from '../../context/chat.context';
+import { ChatContext, CHAT_ACTION_TYPES } from '../../context/chat.context';
 import Button from '../button/button.component';
 
 const AVA_SIZE = 50;
@@ -166,23 +167,33 @@ const Avatar = ({ members }) => {
 	}
 };
 
-const ChatListItem = ({ id, members }) => {
+const ChatListItem = ({ id, members, selected, newUpdate, updated }) => {
+	const { dispatch } = useContext(ChatContext);
 	const names = members.map((member) => member.email.split('@')[0].slice(0, 8)).join(', ');
+	const date = new Date(updated);
 	return (
 		<div
 			onClick={() => {
 				dispatch({ type: CHAT_ACTION_TYPES.SET_CHAT, payload: id });
 			}}
-			className='flex flex-row gap-4 cursor-pointer rounded-lg p-2 items-center overflow-hidden bg-[#333] md:w-full hover:bg-action'
+			className={`flex flex-row gap-4 cursor-pointer rounded-lg p-2 items-center ${
+				selected ? 'bg-secondary' : newUpdate ? 'bg-primary' : 'bg-[#333]'
+			} overflow-hidden md:w-full hover:bg-action`}
 		>
 			<Avatar members={members} />
-			<div className='hidden text-text md:inline truncate'>{names}</div>
+			<div className='hidden md:flex flex-col gap-1 overflow-hidden'>
+				<div className='text-text font-medium inline truncate'>{names}</div>
+				<div className='text-[#fff9] inline truncate'>
+					<ReactTimeAgo date={date} timeStyle='mini-minute-now' />
+				</div>
+			</div>
 		</div>
 	);
 };
 
 const ChatList = ({ setOpenNewChat, chats }) => {
 	const { user } = useContext(AuthContext);
+	const { chat } = useContext(ChatContext);
 	return (
 		<div className='hidden md:flex-1 flex-col bg-layer rounded-lg p-3 gap-5 xs:flex overflow-hidden'>
 			<input
@@ -197,11 +208,14 @@ const ChatList = ({ setOpenNewChat, chats }) => {
 				+
 			</Button>
 			<div className='flex flex-1 flex-col w-full gap-5'>
-				{chats?.map(({ id, members }) => (
+				{chats?.map(({ id, members, updated }) => (
 					<ChatListItem
 						id={id}
 						members={members.filter((member) => member.uid != user.uid)}
 						key={id}
+						selected={chat === id}
+						newUpdate={false}
+						updated={updated}
 					/>
 				))}
 			</div>

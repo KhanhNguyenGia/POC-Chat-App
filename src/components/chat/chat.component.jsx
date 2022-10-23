@@ -89,7 +89,7 @@ const Chat = () => {
 	};
 
 	const onNewChat = async (other) => {
-		if (!(await checkChatExists(user, other)) && user.email !== other.email) {
+		if (!(await checkChatExists([user, other])) && user.email !== other.email) {
 			await createNewChat(user, other);
 		}
 		setFound([]);
@@ -100,7 +100,9 @@ const Chat = () => {
 
 	const onNewGroupChat = async (other) => {
 		const { displayName, uid, photoURL, email } = user;
-		await createGroupChat([{ displayName, uid, email, photoURL }, ...other]);
+		if (!(await checkChatExists([user, ...other])) && user.email !== other.email) {
+			await createGroupChat([{ displayName, uid, email, photoURL }, ...other]);
+		}
 		setFound([]);
 		setUsers([]);
 		setNewSearch('');
@@ -118,8 +120,8 @@ const Chat = () => {
 		);
 		const orderQ = query(memQ, orderBy('updated', 'desc'));
 		const unsubscribeFromChatList = onSnapshot(orderQ, (docs) => {
-			setChats(
-				docs.docs.map((doc) => ({
+			setChats((prev) =>
+				docs.docs.map((doc, index) => ({
 					...doc.data(),
 					id: doc.id,
 				}))

@@ -103,14 +103,11 @@ export const sendMessage = async (message, fileURL, uid, chatId) => {
 	}
 };
 
-export const checkChatExists = async (current, other) => {
+export const checkChatExists = async (members) => {
 	const chatRef = collection(db, `/chats`);
 	const q = query(
 		chatRef,
-		where('membersId', 'in', [
-			[current.uid, other.uid],
-			[other.uid, current.uid],
-		])
+		where('membersId', 'in', [[...members.map((member) => member.uid)].sort()])
 	);
 	const results = await getDocs(q);
 	return results.size;
@@ -122,8 +119,10 @@ export const createNewChat = async (current, other) => {
 	try {
 		const chatRef = collection(db, `/chats`);
 		await addDoc(chatRef, {
-			membersId: [current.uid, other.uid],
-			members: [{ uid, email, photoURL, displayName }, other],
+			membersId: [current.uid, other.uid].sort(),
+			members: [{ uid, email, photoURL, displayName }, other].sort((a, b) =>
+				a.uid.localeCompare(b.uid)
+			),
 			updated: Date.now(),
 		});
 	} catch (e) {
@@ -136,8 +135,8 @@ export const createGroupChat = async (members) => {
 	try {
 		const chatRef = collection(db, `/chats`);
 		await addDoc(chatRef, {
-			membersId: members.map((member) => member.uid),
-			members: members,
+			membersId: members.map((member) => member.uid).sort(),
+			members: members.sort((a, b) => a.uid.localeCompare(b.uid)),
 			updated: Date.now(),
 		});
 	} catch (e) {

@@ -11,6 +11,11 @@ import { AuthContext, AUTH_ACTION_TYPES } from './context/auth.context';
 
 import { auth } from './utils/firebase/firebase.utils';
 
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+
+TimeAgo.addDefaultLocale(en);
+
 function App() {
 	const { user, dispatch } = useContext(AuthContext);
 
