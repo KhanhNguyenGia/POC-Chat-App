@@ -1,33 +1,19 @@
+import Button from '../button/button.component';
+
 const ChatInput = ({ message, onSendMessage, onChange, disabled, files, onRemove }) => {
 	return (
 		<form
-			style={{
-				background: '#333',
-				borderRadius: 4,
-				padding: 10,
-				width: '100%',
-				display: 'flex',
-				flexFlow: 'column',
-				justifyContent: 'center',
-				alignItems: 'center',
-				gap: 10,
-			}}
+			className='bg-[#333] rounded-lg w-full flex flex-col justify-center items-center gap-3 p-3'
 			onSubmit={onSendMessage}
 		>
 			{!!files.length && (
-				<div style={{ display: 'flex', width: '100%', gap: 10 }}>
+				<div className='flex w-full gap-3'>
 					{files.map((file, index) => {
 						if (file.type.startsWith('image/')) {
 							return (
 								<img
 									key={index}
-									width={40}
-									height={40}
-									style={{
-										objectFit: 'cover',
-										objectPosition: 'center',
-										borderRadius: 4,
-									}}
+									className='object-cover object-center rounded-lg w-[40px] h-[40px]'
 									src={file.url}
 									alt={file.name}
 									onClick={() => onRemove(index)}
@@ -37,22 +23,10 @@ const ChatInput = ({ message, onSendMessage, onChange, disabled, files, onRemove
 						return (
 							<div
 								key={index}
-								style={{
-									height: 40,
-									borderRadius: 4,
-									background: '#444',
-									padding: '5px 10px',
-									display: 'grid',
-									placeItems: 'center',
-								}}
+								className='h-[40px] rounded-lg bg-[#444] px-3 py-2 grid place-items-center'
 								onClick={() => onRemove(index)}
 							>
-								<a
-									href={file.url}
-									style={{
-										color: '#fff',
-									}}
-								>
+								<a href={file.url} className='text-text'>
 									{file.name}
 								</a>
 							</div>
@@ -60,28 +34,11 @@ const ChatInput = ({ message, onSendMessage, onChange, disabled, files, onRemove
 					})}
 				</div>
 			)}
-			<div
-				style={{
-					width: '100%',
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-					gap: 10,
-				}}
-			>
-				<input
-					onChange={onChange}
-					value={message}
-					style={{ width: '100%', borderRadius: 4, height: 30 }}
-				/>
-				<button
-					style={{ borderRadius: 4, height: 30, padding: '5px 16px', cursor: 'pointer' }}
-					type='submit'
-					disabled={disabled}
-					onClick={onSendMessage}
-				>
+			<div className='w-full flex justify-center items-center gap-3'>
+				<input onChange={onChange} value={message} className='w-full rounded-lg px-5 py-1 h-full' />
+				<Button disabled={disabled} onClick={onSendMessage}>
 					Send
-				</button>
+				</Button>
 			</div>
 		</form>
 	);

@@ -1,6 +1,8 @@
 import { createContext, useReducer } from 'react';
 
-const DEFAULT_AUTH = { user: null };
+const DEFAULT_AUTH = {
+	user: JSON.parse(localStorage.getItem('user')) || null,
+};
 
 export const AuthContext = createContext();
 
@@ -29,5 +31,6 @@ const authReducer = (state, action) => {
 
 export const AuthProvider = ({ children }) => {
 	const [state, dispatch] = useReducer(authReducer, DEFAULT_AUTH);
+
 	return <AuthContext.Provider value={{ ...state, dispatch }}>{children}</AuthContext.Provider>;
 };

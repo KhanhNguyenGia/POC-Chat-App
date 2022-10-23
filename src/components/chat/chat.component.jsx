@@ -1,9 +1,10 @@
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/auth.context';
 import { ChatContext } from '../../context/chat.context';
 import {
 	checkChatExists,
+	createGroupChat,
 	createNewChat,
 	db,
 	searchUser,
@@ -23,16 +24,25 @@ const Chat = () => {
 	const { chat } = useContext(ChatContext);
 	const { user } = useContext(AuthContext);
 	const [message, setMessage] = useState('');
-	const [newChatId, setNewChatId] = useState('');
+	const [newSearch, setNewSearch] = useState('');
 	const [sending, setSending] = useState(false);
 	const [chats, setChats] = useState([]);
 	const [openNewChat, setOpenNewChat] = useState(false);
 	const [isDragged, setIsDragged] = useState(false);
 	const [files, setFiles] = useState([]);
 	const [found, setFound] = useState([]);
+	const [users, setUsers] = useState([]);
 
-	const onNewChatId = (e) => {
-		setNewChatId(e.target.value);
+	const input = document.getElementById('search-user');
+	input?.focus();
+
+	const onAddUser = (user) => {
+		if (users.map((user) => user.uid).includes(user.uid)) return;
+		setUsers((prev) => [...prev, user]);
+	};
+
+	const onNewSearch = (e) => {
+		setNewSearch(e.target.value);
 		onSearchDebounce(e.target.value);
 	};
 
@@ -41,12 +51,12 @@ const Chat = () => {
 	};
 
 	const onSearch = async (value) => {
-		const found = await searchUser(value);
+		const found = await searchUser(value, user.email);
 		setFound(found);
 	};
 
 	const onSearchDebounce = useCallback(
-		debounce((value) => onSearch(value), 500),
+		debounce((value) => onSearch(value), 300),
 		[]
 	);
 
@@ -78,12 +88,22 @@ const Chat = () => {
 		setSending(false);
 	};
 
-	const onNewChat = async (newChat) => {
-		if (!(await checkChatExists(user.email, newChat)) && user.email !== newChat) {
-			await createNewChat(user, newChat);
+	const onNewChat = async (other) => {
+		if (!(await checkChatExists(user, other)) && user.email !== other.email) {
+			await createNewChat(user, other);
 		}
 		setFound([]);
-		setNewChatId('');
+		setUsers([]);
+		setNewSearch('');
+		setOpenNewChat(false);
+	};
+
+	const onNewGroupChat = async (other) => {
+		const { displayName, uid, photoURL, email } = user;
+		await createGroupChat([{ displayName, uid, email, photoURL }, ...other]);
+		setFound([]);
+		setUsers([]);
+		setNewSearch('');
 		setOpenNewChat(false);
 	};
 
@@ -92,17 +112,19 @@ const Chat = () => {
 	};
 
 	useEffect(() => {
-		const unsubscribeFromChatList = onSnapshot(
-			query(collection(db, `/chats`), where('membersId', 'array-contains', `${user.email}`)),
-			(docs) => {
-				setChats(
-					docs.docs.map((doc) => ({
-						...doc.data(),
-						id: doc.id,
-					}))
-				);
-			}
+		const memQ = query(
+			collection(db, `/chats`),
+			where('membersId', 'array-contains', `${user.uid}`)
 		);
+		const orderQ = query(memQ, orderBy('updated', 'desc'));
+		const unsubscribeFromChatList = onSnapshot(orderQ, (docs) => {
+			setChats(
+				docs.docs.map((doc) => ({
+					...doc.data(),
+					id: doc.id,
+				}))
+			);
+		});
 
 		const onDragOver = (e) => {
 			e.preventDefault();
@@ -153,25 +175,15 @@ const Chat = () => {
 
 	return (
 		<>
-			<main style={{ maxWidth: 1280, marginInline: 'auto', width: '100%', padding: 20 }}>
-				<div style={{ display: 'flex', gap: 20 }}>
-					<ChatList onNewChat={setOpenNewChat} chats={chats} />
-					<div
-						style={{
-							flex: 3,
-							height: '700px',
-							background: '#222',
-							display: 'flex',
-							justifyContent: 'center',
-							flexFlow: 'column',
-							alignItems: 'center',
-							margin: 'auto',
-							borderRadius: 4,
-							overflow: 'auto',
-							padding: 20,
-							gap: 10,
-						}}
-					>
+			<main className='w-full'>
+				<div className='flex gap-5'>
+					<ChatList
+						setOpenNewChat={setOpenNewChat}
+						chats={chats}
+						newSearch={newSearch}
+						onNewSearch={onNewSearch}
+					/>
+					<div className='flex-[4] h-[700px] bg-layer flex justify-center items-center flex-col m-auto rounded-lg gap-3 p-3 overflow-hidden'>
 						{chat && (
 							<>
 								<ChatMain chat={chat} />
@@ -190,25 +202,18 @@ const Chat = () => {
 			</main>
 			{openNewChat && (
 				<NewChatOverlay
-					newChatId={newChatId}
-					onNewChatId={onNewChatId}
+					users={users}
+					onAddUser={onAddUser}
+					newSearch={newSearch}
+					onNewSearch={onNewSearch}
 					setOpenNewChat={setOpenNewChat}
-					onNewChat={onNewChat}
 					found={found}
+					onNewGroupChat={onNewGroupChat}
+					setUsers={setUsers}
+					onNewChat={onNewChat}
 				/>
 			)}
-			{isDragged && (
-				<div
-					style={{
-						width: '100vw',
-						height: '100vh',
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						background: '#0009',
-					}}
-				></div>
-			)}
+			{isDragged && <div className='w-screen h-screen absolute top-0 left-0 bg-[#0009]'></div>}
 		</>
 	);
 };

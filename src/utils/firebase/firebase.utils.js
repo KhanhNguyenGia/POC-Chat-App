@@ -6,8 +6,10 @@ import {
 	getDoc,
 	getDocs,
 	getFirestore,
+	limit,
 	query,
 	setDoc,
+	updateDoc,
 	where,
 } from 'firebase/firestore';
 import {
@@ -38,11 +40,11 @@ const googleProvider = new GoogleAuthProvider();
 export const googlePopup = async () => {
 	try {
 		const { user } = await signInWithPopup(auth, googleProvider);
-		const userRef = doc(db, `/users/${user.email}`);
-		const { uid, email } = user;
+		const userRef = doc(db, `/users/${user.uid}`);
+		const { uid, email, photoURL, displayName } = user;
 		const userDoc = await getDoc(userRef);
 		if (userDoc.exists()) return;
-		await setDoc(userRef, { uid, email });
+		await setDoc(userRef, { uid, email, photoURL, displayName });
 	} catch (e) {
 		console.log(e);
 	}
@@ -52,10 +54,16 @@ export const signInWithEmail = async (email, password) => {
 	if (!email || !password) return;
 	try {
 		const { user } = await signInWithEmailAndPassword(auth, email, password);
-		const userRef = doc(db, `/users/${user.email}`);
+		const userRef = doc(db, `/users/${user.uid}`);
 		const userDoc = await getDoc(userRef);
 		if (userDoc.exists()) return;
-		await setDoc(userRef, { uid: user.uid, email: user.email });
+		await setDoc(userRef, {
+			uid: user.uid,
+			email: user.email,
+			photoURL: user.photoURL,
+			displayName: user.displayName,
+		});
+		return user;
 	} catch (e) {
 		console.log(e);
 	}
@@ -65,8 +73,13 @@ export const signUp = async (email, password) => {
 	if (!email || !password) return;
 	try {
 		const { user } = await createUserWithEmailAndPassword(auth, email, password);
-		const userRef = doc(db, `/users/${user.email}`);
-		await setDoc(userRef, { uid: user.uid, email: user.email });
+		const userRef = doc(db, `/users/${user.uid}`);
+		await setDoc(userRef, {
+			uid: user.uid,
+			email: user.email,
+			photoURL: user.photoURL,
+			displayName: user.displayName,
+		});
 	} catch (e) {
 		console.log(e);
 	}
@@ -79,6 +92,10 @@ export const logoutUser = async () => {
 export const sendMessage = async (message, fileURL, uid, chatId) => {
 	if ((!message && !fileURL) || !chatId || !uid) return;
 	try {
+		const chatDocRef = doc(db, `/chats/${chatId}`);
+		await updateDoc(chatDocRef, {
+			updated: Date.now(),
+		});
 		const chatRef = collection(db, `/chats/${chatId}/messages`);
 		await addDoc(chatRef, { content: message, uid, fileURL: fileURL || [], sent: Date.now() });
 	} catch (e) {
@@ -86,29 +103,50 @@ export const sendMessage = async (message, fileURL, uid, chatId) => {
 	}
 };
 
-export const findUser = async (otherEmail) => {
-	if (!otherEmail) return;
-	const userRef = doc(db, `/users/${otherEmail}`);
-	const result = await getDoc(userRef);
-	return result.data();
-};
+// export const findUser = async (otherEmail) => {
+// 	if (!otherEmail) return;
+// 	const userRef = collection(db, `/users`);
+// 	const q = query(userRef, where('email', '==', otherEmail));
+// 	const result = await getDoc(q);
+// 	return result.data();
+// };
 
-export const checkChatExists = async (currentEmail, otherEmail) => {
+export const checkChatExists = async (current, other) => {
 	const chatRef = collection(db, `/chats`);
-	const q = query(chatRef, where('membersId', 'in', [[currentEmail, otherEmail]]));
+	const q = query(
+		chatRef,
+		where('membersId', 'in', [
+			[current.uid, other.uid],
+			[other.uid, current.uid],
+		])
+	);
 	const results = await getDocs(q);
 	return results.size;
 };
 
-export const createNewChat = async (current, otherEmail) => {
-	const other = await findUser(otherEmail);
+export const createNewChat = async (current, other) => {
 	if (!current || !other) return;
+	const { uid, email, photoURL, displayName } = current;
 	try {
-		const { uid, email } = current;
 		const chatRef = collection(db, `/chats`);
 		await addDoc(chatRef, {
-			membersId: [current.email, other.email],
-			members: [{ uid, email }, other],
+			membersId: [current.uid, other.uid],
+			members: [{ uid, email, photoURL, displayName }, other],
+			updated: Date.now(),
+		});
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const createGroupChat = async (members) => {
+	if (!members || !members.length) return;
+	try {
+		const chatRef = collection(db, `/chats`);
+		await addDoc(chatRef, {
+			membersId: members.map((member) => member.uid),
+			members: members,
+			updated: Date.now(),
 		});
 	} catch (e) {
 		console.log(e);
@@ -122,11 +160,18 @@ export const uploadFiles = async (chatId, file) => {
 	return snapshot;
 };
 
-export const searchUser = async (email) => {
-	if (!email) return;
+export const searchUser = async (search, currentEmail) => {
+	if (!search) return;
 	const userRef = collection(db, '/users');
-	const result = await getDocs(userRef);
+	const q = query(userRef, limit(10));
+	const result = await getDocs(q);
 	if (result.empty) return;
 	const docs = await Promise.all(result.docs.map((doc) => doc.data()));
-	return docs.filter((doc) => doc.email.includes(email));
+	return docs.filter((doc) => doc.email.includes(search) && doc.email !== currentEmail);
+};
+
+export const getChatMembers = async (chatId) => {
+	const docRef = doc(db, `/chats/${chatId}`);
+	const result = await getDoc(docRef);
+	return await result.data().members;
 };
