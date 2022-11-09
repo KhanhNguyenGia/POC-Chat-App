@@ -34,9 +34,8 @@ const Avatar = ({ members }) => {
 						) : (
 							<div
 								key={member?.email}
-								className={`text-text font-medium text-4xl flex justify-center items-center`}
+								className={`text-text font-medium text-4xl flex justify-center items-center bg-slate-500`}
 								style={{
-									background: `#${Math.floor(Math.random() * 999999 + 1)}`,
 									width: AVA_SIZE / 1,
 									height: AVA_SIZE / 1,
 								}}
@@ -73,9 +72,8 @@ const Avatar = ({ members }) => {
 						) : (
 							<div
 								key={member?.email}
-								className={`text-text font-medium text-2xl flex justify-center items-center`}
+								className={`text-text font-medium text-2xl flex justify-center items-center bg-slate-500`}
 								style={{
-									background: `#${Math.floor(Math.random() * 999999 + 1)}`,
 									width: AVA_SIZE / 2,
 									height: AVA_SIZE / 1,
 								}}
@@ -112,9 +110,8 @@ const Avatar = ({ members }) => {
 						) : (
 							<div
 								key={member?.email}
-								className={`text-text font-medium text-xl flex justify-center items-center`}
+								className={`text-text font-medium text-xl flex justify-center items-center bg-slate-500`}
 								style={{
-									background: `#${Math.floor(Math.random() * 999999 + 1)}`,
 									width: index === 2 ? AVA_SIZE / 1 : AVA_SIZE / 2,
 									height: AVA_SIZE / 2,
 								}}
@@ -151,9 +148,8 @@ const Avatar = ({ members }) => {
 						) : (
 							<div
 								key={member?.email}
-								className={`text-text font-medium text-xl flex justify-center items-center`}
+								className={`text-text font-medium text-xl flex justify-center items-center bg-slate-500`}
 								style={{
-									background: `#${Math.floor(Math.random() * 999999 + 1)}`,
 									width: AVA_SIZE / 2,
 									height: AVA_SIZE / 2,
 								}}

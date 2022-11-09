@@ -1,16 +1,18 @@
 import { onAuthStateChanged } from 'firebase/auth';
-import { useContext, useEffect, Suspense } from 'react';
+import { useContext, useEffect, Suspense, lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 import './App.css';
-import Chat from './components/chat/chat.component';
-import { LogInForm, RegisterForm } from './components/form';
-import NavBar from './components/nav/nav.component';
 import { AuthContext, AUTH_ACTION_TYPES } from './context/auth.context';
-
 import { auth } from './utils/firebase/firebase.utils';
-
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+// import NavBar from './components/nav/nav.component';
+const NavBar = lazy(() => import('./components/nav/nav.component'));
+//import Chat from './components/chat/chat.component';
+const Chat = lazy(() => import('./components/chat/chat.component'));
+// import { LogInForm, RegisterForm } from './components/form';
+const LogInForm = lazy(() => import('./components/form/form-login.component'));
+const RegisterForm = lazy(() => import('./components/form/form-register.component'));
 import Spinner from './components/spinner/spinner.component';
 
 TimeAgo.addDefaultLocale(en);
