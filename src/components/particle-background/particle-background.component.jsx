@@ -18,7 +18,7 @@ const ParticleBackground = () => {
 				opacity: 0.9,
 			}}
 			id='tsparticles'
-			url='../../../particle.json'
+			url='/particle.json'
 			init={particlesInit}
 			loaded={particlesLoaded}
 		/>
