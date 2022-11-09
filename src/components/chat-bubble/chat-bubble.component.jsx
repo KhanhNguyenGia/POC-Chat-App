@@ -1,9 +1,7 @@
-const DEFAULT_STYLE = 'rounded-lg text-text px-3 py-2 w-max';
+const DEFAULT_STYLE = 'rounded-lg text-text px-3 py-2';
 
 const ChatBubble = ({ current, children, belongsTo, same }) => {
-	const STYLE = `${DEFAULT_STYLE} ${
-		current ? 'bg-gradient-to-b from-[#2a80da] to-[#ea4aff]' : 'bg-layer'
-	}`;
+	const STYLE = `${DEFAULT_STYLE} ${current ? 'bg-primary' : 'bg-layer max-w-full'}`;
 
 	return (
 		<div
@@ -13,15 +11,15 @@ const ChatBubble = ({ current, children, belongsTo, same }) => {
 		>
 			{!current && !same && (
 				<div>
-					{belongsTo.photoURL ? (
+					{belongsTo?.photoURL ? (
 						<img
-							src={belongsTo.photoURL}
+							src={belongsTo?.photoURL}
 							className='min-w-[40px] max-w-[40px] min-h-[40px] max-h-[40px] object-cover object-center rounded-full'
-							alt={belongsTo.email}
+							alt={belongsTo?.email}
 						/>
 					) : (
 						<div className='min-w-[40px] max-w-[40px] min-h-[40px] max-h-[40px] object-cover object-center rounded-full bg-action text-text font-medium text-2xl flex justify-center items-center'>
-							{belongsTo.email.charAt(0).toUpperCase()}
+							{belongsTo?.email.charAt(0).toUpperCase()}
 						</div>
 					)}
 				</div>

@@ -14,7 +14,7 @@ const ChatMain = ({ chat }) => {
 
 	useEffect(() => {
 		const unsubscribeFromChat = onSnapshot(
-			query(collection(db, `/chats/${chat}/messages`), limit(50), orderBy('sent', 'asc')),
+			query(collection(db, `/chats/${chat}/messages`), limit(50), orderBy('sent', 'desc')),
 			(docs) => {
 				setMessages(
 					docs.docs.map((doc) => {
@@ -40,9 +40,14 @@ const ChatMain = ({ chat }) => {
 		};
 	}, [chat]);
 
+	useEffect(() => {
+		const main = document.querySelector('.chat__main');
+		main?.scrollTo({ top: main.scrollHeight, behavior: 'smooth' });
+	}, [messages]);
+
 	return (
 		<>
-			<div className='flex-1 bg-[#333] w-full rounded-lg flex flex-col justify-end overflow-y-auto p-3 gap-2 overflow-x-hidden'>
+			<div className='chat__main bg-[#333] w-full rounded-lg flex flex-col-reverse mt-auto p-3 gap-2 overflow-auto max-h-[600px]'>
 				{!!messages.length ? (
 					messages?.map(({ id, uid, content, fileURL }, index) => (
 						<ChatBubble
@@ -51,31 +56,33 @@ const ChatMain = ({ chat }) => {
 							belongsTo={members.find((member) => member.uid === uid)}
 							same={index !== 0 && messages[index].uid === messages[index - 1].uid}
 						>
-							<div>
-								{fileURL.map((file) => {
-									if (file.type.startsWith('image/'))
+							{!!fileURL?.length && (
+								<div>
+									{fileURL.map((file) => {
+										if (file.type.startsWith('image/'))
+											return (
+												<img
+													key={file.ref}
+													src={file.ref}
+													alt='user image'
+													className='object-cover object-center w-[60px] h-[60px]'
+													onClick={() => setPreview({ ref: file.ref, type: file.type })}
+												/>
+											);
 										return (
-											<img
+											<div
 												key={file.ref}
-												src={file.ref}
-												alt='user image'
-												className='object-cover object-center w-[60px] h-[60px]'
+												className='h-[40px] rounded-lg px-3 py-2 grid place-items-center'
 												onClick={() => setPreview({ ref: file.ref, type: file.type })}
-											/>
+											>
+												<span href={file.ref} className='text-text cursor-pointer'>
+													{file.name}
+												</span>
+											</div>
 										);
-									return (
-										<div
-											key={file.ref}
-											className='h-[40px] rounded-lg px-3 py-2 grid place-items-center'
-											onClick={() => setPreview({ ref: file.ref, type: file.type })}
-										>
-											<span href={file.ref} className='text-text cursor-pointer'>
-												{file.name}
-											</span>
-										</div>
-									);
-								})}
-							</div>
+									})}
+								</div>
+							)}
 							{content}
 						</ChatBubble>
 					))

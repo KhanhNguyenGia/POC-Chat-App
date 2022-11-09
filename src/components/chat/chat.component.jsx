@@ -186,7 +186,7 @@ const Chat = () => {
 						onNewSearch={onNewSearch}
 					/>
 					<div className='flex-[4] h-[700px] bg-layer flex justify-center items-center flex-col m-auto rounded-lg gap-3 p-3 overflow-hidden'>
-						{chat && (
+						{chat ? (
 							<>
 								<ChatMain chat={chat} />
 								<ChatInput
@@ -198,6 +198,8 @@ const Chat = () => {
 									onRemove={onRemove}
 								/>
 							</>
+						) : (
+							<div className='text-text font-semibold text-3xl'>Choose a conversation</div>
 						)}
 					</div>
 				</div>

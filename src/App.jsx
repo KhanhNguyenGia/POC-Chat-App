@@ -1,11 +1,9 @@
 import { onAuthStateChanged } from 'firebase/auth';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
-import { Link } from 'react-router-dom';
 import './App.css';
-import Button from './components/button/button.component';
 import Chat from './components/chat/chat.component';
-import { SignInForm } from './components/form';
+import { LogInForm, RegisterForm } from './components/form';
 import NavBar from './components/nav/nav.component';
 import { AuthContext, AUTH_ACTION_TYPES } from './context/auth.context';
 
@@ -13,6 +11,7 @@ import { auth } from './utils/firebase/firebase.utils';
 
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import Spinner from './components/spinner/spinner.component';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -32,13 +31,16 @@ function App() {
 
 	return (
 		<>
-			<div className='App flex flex-col'>
-				<Routes>
-					<Route path='/' element={<NavBar />}>
-						<Route index element={user ? <Chat /> : <Navigate to='/signin' />} />
-						<Route path='/signin' element={user ? <Navigate to='/' /> : <SignInForm />} />
-					</Route>
-				</Routes>
+			<div className='App flex flex-col gap-5'>
+				<Suspense loading={<Spinner />}>
+					<Routes>
+						<Route path='/' element={<NavBar />}>
+							<Route index element={user ? <Chat /> : <Navigate to='/login' />} />
+							<Route path='/login' element={user ? <Navigate to='/' /> : <LogInForm />} />
+							<Route path='/register' element={user ? <Navigate to='/' /> : <RegisterForm />} />
+						</Route>
+					</Routes>
+				</Suspense>
 			</div>
 		</>
 	);

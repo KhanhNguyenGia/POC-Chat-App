@@ -19,6 +19,8 @@ import {
 	GoogleAuthProvider,
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword,
+	FacebookAuthProvider,
+	signInWithRedirect,
 } from 'firebase/auth';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 
@@ -31,58 +33,61 @@ const firebaseConfig = {
 	appId: '1:228297410990:web:0f57004f2ad82e9acee03f',
 };
 
+export const AUTH_ERROR_TYPE = {
+	PASSWORD_DO_NOT_MATCH: 'Password do not match',
+	USER_NOT_FOUND: 'auth/user-not-found',
+	WRONG_PASSWORD: 'auth/wrong-password',
+};
+
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
-const googleProvider = new GoogleAuthProvider();
+export const googleProvider = new GoogleAuthProvider();
+export const facebookProvider = new FacebookAuthProvider();
+
+export const setUser = async (user) => {
+	const userRef = doc(db, `/users/${user.uid}`);
+	const { uid, email, photoURL, displayName } = user;
+	const userDoc = await getDoc(userRef);
+	if (userDoc.exists()) return;
+	await setDoc(userRef, { uid, email, photoURL, displayName });
+};
 
 export const googlePopup = async () => {
-	try {
-		const { user } = await signInWithPopup(auth, googleProvider);
-		const userRef = doc(db, `/users/${user.uid}`);
-		const { uid, email, photoURL, displayName } = user;
-		const userDoc = await getDoc(userRef);
-		if (userDoc.exists()) return;
-		await setDoc(userRef, { uid, email, photoURL, displayName });
-	} catch (e) {
-		console.log(e);
-	}
+	const { user } = await signInWithPopup(auth, googleProvider);
+	const userRef = doc(db, `/users/${user.uid}`);
+	const { uid, email, photoURL, displayName } = user;
+	const userDoc = await getDoc(userRef);
+	if (userDoc.exists()) return;
+	await setDoc(userRef, { uid, email, photoURL, displayName });
 };
 
 export const signInWithEmail = async (email, password) => {
 	if (!email || !password) return;
-	try {
-		const { user } = await signInWithEmailAndPassword(auth, email, password);
-		const userRef = doc(db, `/users/${user.uid}`);
-		const userDoc = await getDoc(userRef);
-		if (userDoc.exists()) return;
-		await setDoc(userRef, {
-			uid: user.uid,
-			email: user.email,
-			photoURL: user.photoURL,
-			displayName: user.displayName,
-		});
-		return user;
-	} catch (e) {
-		console.log(e);
-	}
+	const { user } = await signInWithEmailAndPassword(auth, email, password);
+	const userRef = doc(db, `/users/${user.uid}`);
+	const userDoc = await getDoc(userRef);
+	if (userDoc.exists()) return;
+	await setDoc(userRef, {
+		uid: user.uid,
+		email: user.email,
+		photoURL: user.photoURL,
+		displayName: user.displayName,
+	});
+	return user;
 };
 
 export const signUp = async (email, password) => {
 	if (!email || !password) return;
-	try {
-		const { user } = await createUserWithEmailAndPassword(auth, email, password);
-		const userRef = doc(db, `/users/${user.uid}`);
-		await setDoc(userRef, {
-			uid: user.uid,
-			email: user.email,
-			photoURL: user.photoURL,
-			displayName: user.displayName,
-		});
-	} catch (e) {
-		console.log(e);
-	}
+	const { user } = await createUserWithEmailAndPassword(auth, email, password);
+	const userRef = doc(db, `/users/${user.uid}`);
+	await setDoc(userRef, {
+		uid: user.uid,
+		email: user.email,
+		photoURL: user.photoURL,
+		displayName: user.displayName,
+	});
 };
 
 export const logoutUser = async () => {

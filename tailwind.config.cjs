@@ -2,17 +2,17 @@
 module.exports = {
 	content: ['./src/**/*.{js,jsx,ts,tsx}'],
 	theme: {
-		colors: {
-			primary: '#47B5FF',
-			secondary: '#256D85',
-			action: '#06283D',
-			bg: '#121212',
-			layer: '#222',
-			text: '#fff',
-		},
 		extend: {
 			screens: {
 				xs: '450px',
+			},
+			colors: {
+				primary: '#0092CA',
+				secondary: '#145374',
+				action: '#1F6CB0 ',
+				bg: '#121212',
+				layer: '#222',
+				text: '#fff',
 			},
 		},
 	},

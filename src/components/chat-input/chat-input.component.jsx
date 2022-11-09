@@ -35,7 +35,7 @@ const ChatInput = ({ message, onSendMessage, onChange, disabled, files, onRemove
 				</div>
 			)}
 			<div className='w-full flex justify-center items-center gap-3'>
-				<input onChange={onChange} value={message} className='w-full rounded-lg px-5 py-1 h-full' />
+				<input onChange={onChange} value={message} className='w-full rounded-lg px-5 py-1 h-10' />
 				<Button disabled={disabled} onClick={onSendMessage}>
 					Send
 				</Button>
