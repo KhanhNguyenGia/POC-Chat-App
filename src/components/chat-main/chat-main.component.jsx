@@ -47,7 +47,7 @@ const ChatMain = ({ chat }) => {
 
 	return (
 		<>
-			<div className='chat__main bg-[#333] w-full rounded-lg flex flex-col-reverse mt-auto p-3 gap-2 overflow-auto max-h-[600px]'>
+			<div className='chat__main bg-[#333] w-full rounded-lg flex flex-col-reverse mt-auto p-3 gap-2 overflow-auto h-[600px] max-h-[600px]'>
 				{!!messages.length ? (
 					messages?.map(({ id, uid, content, fileURL }, index) => (
 						<ChatBubble
