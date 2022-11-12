@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/auth.context';
 import { logoutUser } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
-import ParticleBackground from '../particle-background/particle-background.component';
 
 const NavBar = () => {
 	const { user } = useContext(AuthContext);
@@ -48,7 +47,7 @@ const NavBar = () => {
 					)}
 				</div>
 			</nav>
-			<div className='px-5 max-w-7xl m-auto w-full'>
+			<div className='px-5 pb-5 max-w-7xl m-auto w-full h-[calc(100vh_-_80px)]'>
 				<Outlet />
 			</div>
 		</>

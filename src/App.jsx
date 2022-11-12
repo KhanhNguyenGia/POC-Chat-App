@@ -33,7 +33,7 @@ function App() {
 
 	return (
 		<>
-			<div className='App flex flex-col gap-5'>
+			<div className='App flex flex-col'>
 				<Suspense loading={<Spinner />}>
 					<Routes>
 						<Route path='/' element={<NavBar />}>

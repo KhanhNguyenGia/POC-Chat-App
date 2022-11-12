@@ -1,167 +1,9 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import ReactTimeAgo from 'react-time-ago';
 import { AuthContext } from '../../context/auth.context';
 import { ChatContext, CHAT_ACTION_TYPES } from '../../context/chat.context';
 import Button from '../button/button.component';
-
-const AVA_SIZE = 50;
-
-const Avatar = ({ members }) => {
-	switch (members.length) {
-		case 1:
-			return (
-				<div
-					className={`flex flex-row rounded-lg overflow-hidden`}
-					style={{
-						width: AVA_SIZE,
-						height: AVA_SIZE,
-						minWidth: AVA_SIZE,
-						minHeight: AVA_SIZE,
-					}}
-				>
-					{members.map((member) =>
-						member?.photoURL ? (
-							<img
-								key={member?.email}
-								src={member?.photoURL}
-								alt={member?.email}
-								className={`object-center object-cover`}
-								style={{
-									width: AVA_SIZE / 1,
-									height: AVA_SIZE / 1,
-								}}
-							/>
-						) : (
-							<div
-								key={member?.email}
-								className={`text-text font-medium text-4xl flex justify-center items-center bg-slate-500`}
-								style={{
-									width: AVA_SIZE / 1,
-									height: AVA_SIZE / 1,
-								}}
-							>
-								{member?.email.charAt(0).toUpperCase()}
-							</div>
-						)
-					)}
-				</div>
-			);
-		case 2:
-			return (
-				<div
-					className={`flex flex-row rounded-lg overflow-hidden flex-wrap`}
-					style={{
-						width: AVA_SIZE,
-						height: AVA_SIZE,
-						minWidth: AVA_SIZE,
-						minHeight: AVA_SIZE,
-					}}
-				>
-					{members.map((member) =>
-						member?.photoURL ? (
-							<img
-								key={member?.email}
-								src={member?.photoURL}
-								alt={member?.email}
-								className={`object-center object-cover`}
-								style={{
-									width: AVA_SIZE / 2,
-									height: AVA_SIZE / 1,
-								}}
-							/>
-						) : (
-							<div
-								key={member?.email}
-								className={`text-text font-medium text-2xl flex justify-center items-center bg-slate-500`}
-								style={{
-									width: AVA_SIZE / 2,
-									height: AVA_SIZE / 1,
-								}}
-							>
-								{member?.email.charAt(0).toUpperCase()}
-							</div>
-						)
-					)}
-				</div>
-			);
-		case 3:
-			return (
-				<div
-					className={`flex flex-row rounded-lg overflow-hidden flex-wrap`}
-					style={{
-						width: AVA_SIZE,
-						height: AVA_SIZE,
-						minWidth: AVA_SIZE,
-						minHeight: AVA_SIZE,
-					}}
-				>
-					{members.map((member, index) =>
-						member?.photoURL ? (
-							<img
-								key={member?.email}
-								src={member?.photoURL}
-								alt={member?.email}
-								className={`object-center object-cover`}
-								style={{
-									width: index === 2 ? AVA_SIZE / 1 : AVA_SIZE / 2,
-									height: AVA_SIZE / 2,
-								}}
-							/>
-						) : (
-							<div
-								key={member?.email}
-								className={`text-text font-medium text-xl flex justify-center items-center bg-slate-500`}
-								style={{
-									width: index === 2 ? AVA_SIZE / 1 : AVA_SIZE / 2,
-									height: AVA_SIZE / 2,
-								}}
-							>
-								{member?.email.charAt(0).toUpperCase()}
-							</div>
-						)
-					)}
-				</div>
-			);
-		default:
-			return (
-				<div
-					className={`flex flex-row rounded-lg overflow-hidden flex-wrap`}
-					style={{
-						width: AVA_SIZE,
-						height: AVA_SIZE,
-						minWidth: AVA_SIZE,
-						minHeight: AVA_SIZE,
-					}}
-				>
-					{members.map((member) =>
-						member?.photoURL ? (
-							<img
-								key={member?.email}
-								src={member?.photoURL}
-								alt={member?.email}
-								className={`object-center object-cover`}
-								style={{
-									width: AVA_SIZE / 2,
-									height: AVA_SIZE / 2,
-								}}
-							/>
-						) : (
-							<div
-								key={member?.email}
-								className={`text-text font-medium text-xl flex justify-center items-center bg-slate-500`}
-								style={{
-									width: AVA_SIZE / 2,
-									height: AVA_SIZE / 2,
-								}}
-							>
-								{member?.email.charAt(0).toUpperCase()}
-							</div>
-						)
-					)}
-				</div>
-			);
-	}
-};
+import Avatar from '../avatar/avatar.component';
 
 const ChatListItem = ({ id, members, selected, newUpdate, updated }) => {
 	const { dispatch } = useContext(ChatContext);
@@ -177,7 +19,7 @@ const ChatListItem = ({ id, members, selected, newUpdate, updated }) => {
 			} overflow-hidden md:w-full hover:bg-action`}
 		>
 			<Avatar members={members} />
-			<div className='hidden md:flex flex-col gap-1 overflow-hidden'>
+			<div className='flex xs:hidden md:flex flex-col gap-1 overflow-hidden'>
 				<div className='text-text font-medium inline truncate'>{names}</div>
 				<div className='text-[#fff9] inline truncate'>
 					<ReactTimeAgo date={date} timeStyle='mini-minute-now' />
@@ -187,7 +29,7 @@ const ChatListItem = ({ id, members, selected, newUpdate, updated }) => {
 	);
 };
 
-const ChatListLoading = () => (
+const ChatListItemLoading = () => (
 	<div
 		className={`animate-pulse flex flex-row gap-4 rounded-lg p-2 bg-[#333] items-center overflow-hidden md:w-full min-h-[66px]`}
 	>
@@ -203,10 +45,10 @@ const ChatList = ({ setOpenNewChat, chats }) => {
 	const { user } = useContext(AuthContext);
 	const { chat } = useContext(ChatContext);
 	return (
-		<div className='hidden md:flex-1 flex-col bg-layer rounded-lg p-3 gap-5 xs:flex overflow-hidden'>
+		<div className='md:flex-1 flex-col bg-layer rounded-lg p-3 gap-5 flex overflow-hidden max-h-full xs:flex-none flex-1'>
 			<div className='sticky'>
 				{/* <input
-					className='hidden md:block px-3 py-2 rounded-lg w-full h-[50px]'
+					className='xs:hidden md:block px-3 py-2 rounded-lg w-full h-[50px]'
 					placeholder='Search user...'
 					onFocus={() => setOpenNewChat(true)}
 				/> */}
@@ -229,7 +71,7 @@ const ChatList = ({ setOpenNewChat, chats }) => {
 								updated={updated}
 							/>
 					  ))
-					: [...Array(10)].map((_, index) => <ChatListLoading key={index} />)}
+					: [...Array(5)].map((_, index) => <ChatListItemLoading key={index} />)}
 			</div>
 		</div>
 	);

@@ -4,6 +4,7 @@ export const ChatContext = createContext();
 
 export const CHAT_ACTION_TYPES = {
 	SET_CHAT: 'CHAT/SET_CHAT',
+	CLEAR_CHAT: 'CHAT/CLEAR_CHAT',
 };
 
 export const DEFAULT_CHAT = {
@@ -15,6 +16,8 @@ export const chatReducer = (state, action) => {
 	switch (type) {
 		case CHAT_ACTION_TYPES.SET_CHAT:
 			return { ...state, chat: payload };
+		case CHAT_ACTION_TYPES.CLEAR_CHAT:
+			return { ...state, chat: null };
 		default:
 			return state;
 	}
