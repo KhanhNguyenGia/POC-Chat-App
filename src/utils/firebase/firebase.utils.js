@@ -171,3 +171,10 @@ export const getChatMembers = async (chatId) => {
 	const result = await getDoc(docRef);
 	return await result.data().members;
 };
+
+export const checkChatValid = async (chat) => {
+	if (!chat) return false;
+	const docRef = doc(db, 'chats', chat);
+	const docSnap = await getDoc(docRef);
+	return docSnap.exists();
+};

@@ -1,22 +1,26 @@
 import { useContext } from 'react';
 import ReactTimeAgo from 'react-time-ago';
 import { AuthContext } from '../../context/auth.context';
-import { ChatContext, CHAT_ACTION_TYPES } from '../../context/chat.context';
+// import { ChatContext, CHAT_ACTION_TYPES } from '../../context/chat.context';
 import Button from '../button/button.component';
 import Avatar from '../avatar/avatar.component';
+import { useNavigate, useParams } from 'react-router';
+import { AddIcon } from '../../assets/icon';
 
 const ChatListItem = ({ id, members, selected, newUpdate, updated }) => {
-	const { dispatch } = useContext(ChatContext);
+	const navigate = useNavigate();
+	// const { dispatch } = useContext(ChatContext);
 	const names = members.map((member) => member.email.split('@')[0].slice(0, 8)).join(', ');
 	const date = new Date(updated);
 	return (
 		<div
 			onClick={() => {
-				dispatch({ type: CHAT_ACTION_TYPES.SET_CHAT, payload: id });
+				// dispatch({ type: CHAT_ACTION_TYPES.SET_CHAT, payload: id });
+				navigate(`/${id}`);
 			}}
 			className={`flex flex-row gap-4 cursor-pointer rounded-lg p-2 items-center transition-all duration-300 ${
 				selected ? ' bg-secondary' : newUpdate ? 'bg-primary' : 'bg-[#333]'
-			} overflow-hidden md:w-full hover:bg-action`}
+			} overflow-hidden md:w-full hover:bg-action shadow-xl`}
 		>
 			<Avatar members={members} />
 			<div className='flex xs:hidden md:flex flex-col gap-1 overflow-hidden'>
@@ -43,9 +47,10 @@ const ChatListItemLoading = () => (
 
 const ChatList = ({ setOpenNewChat, chats }) => {
 	const { user } = useContext(AuthContext);
-	const { chat } = useContext(ChatContext);
+	// const { chat } = useContext(ChatContext);
+	const { chatId: chat } = useParams();
 	return (
-		<div className='md:flex-1 flex-col bg-layer rounded-lg p-3 gap-5 flex overflow-hidden max-h-full xs:flex-none flex-1'>
+		<div className='md:flex-1 flex-col bg-layer xs:rounded-lg p-3 gap-5 flex overflow-hidden max-h-full xs:flex-none flex-1'>
 			<div className='sticky'>
 				{/* <input
 					className='xs:hidden md:block px-3 py-2 rounded-lg w-full h-[50px]'
@@ -56,7 +61,7 @@ const ChatList = ({ setOpenNewChat, chats }) => {
 					className='flex-none w-full text-3xl font-bold h-[50px] rounded-lg'
 					onClick={() => setOpenNewChat(true)}
 				>
-					+
+					<AddIcon className='stroke-2 m-auto' />
 				</Button>
 			</div>
 			<div className='flex flex-1 flex-col w-full gap-5 max-h-[600px] overflow-auto'>

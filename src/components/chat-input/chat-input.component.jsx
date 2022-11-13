@@ -1,16 +1,16 @@
 import { useContext, useEffect, useState } from 'react';
 import { uuidv4 } from '@firebase/util';
 import { AuthContext } from '../../context/auth.context';
-import { ChatContext } from '../../context/chat.context';
 import { sendMessage, uploadFiles } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
+import { useParams } from 'react-router';
 
 //{ message, onSendMessage, onChange, disabled, files, onRemove }
 const MAX_SIZE = 1000000;
 
 const ChatInput = () => {
 	const { user } = useContext(AuthContext);
-	const { chat } = useContext(ChatContext);
+	const { chatId: chat } = useParams();
 	const [files, setFiles] = useState([]);
 	const [message, setMessage] = useState('');
 	const [sending, setSending] = useState(false);
@@ -112,7 +112,7 @@ const ChatInput = () => {
 								return (
 									<img
 										key={index}
-										className='object-cover object-center rounded-lg w-[40px] h-[40px]'
+										className='object-cover object-center rounded-lg w-[40px] h-[40px] shadow-xl'
 										src={file.url}
 										alt={file.name}
 										onClick={() => onRemove(index)}
@@ -122,7 +122,7 @@ const ChatInput = () => {
 							return (
 								<div
 									key={index}
-									className='h-[40px] rounded-lg bg-[#444] px-3 py-2 grid place-items-center'
+									className='h-[40px] rounded-lg bg-[#444] px-3 py-2 grid place-items-center shadow-xl'
 									onClick={() => onRemove(index)}
 								>
 									<a href={file.url} className='text-text'>
@@ -137,7 +137,7 @@ const ChatInput = () => {
 					<input
 						onChange={onChange}
 						value={message}
-						className='w-full rounded-lg px-5 py-1 h-10'
+						className='w-full rounded-lg px-5 py-1 h-10 shadow-xl bg-gray-200 disabled:bg-slate-900'
 						disabled={sending}
 					/>
 					<Button disabled={sending} onClick={onSendMessage}>

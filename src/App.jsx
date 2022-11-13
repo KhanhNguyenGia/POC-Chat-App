@@ -40,6 +40,7 @@ function App() {
 							<Route index element={user ? <Chat /> : <Navigate to='/login' />} />
 							<Route path='/login' element={user ? <Navigate to='/' /> : <LogInForm />} />
 							<Route path='/register' element={user ? <Navigate to='/' /> : <RegisterForm />} />
+							<Route path='/:chatId' element={user ? <Chat /> : <Navigate to='/login' />} />
 						</Route>
 					</Routes>
 				</Suspense>

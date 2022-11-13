@@ -1,15 +1,17 @@
 import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/auth.context';
+import { ChatContext } from '../../context/chat.context';
 import { db, getChatMembers } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
 import ChatBubble from '../chat-bubble/chat-bubble.component';
 
-const ChatMain = ({ chat }) => {
+const ChatMain = ({ chat, setPreview }) => {
+	// const { chatId: chat } = useParams();
+	// const { chat } = useContext(ChatContext);
 	const [messages, setMessages] = useState([]);
 	const { user } = useContext(AuthContext);
-	const [preview, setPreview] = useState(null);
 	const [members, setMembers] = useState([]);
 
 	useEffect(() => {
@@ -47,7 +49,7 @@ const ChatMain = ({ chat }) => {
 
 	return (
 		<>
-			<div className='chat__main bg-[#333] w-full rounded-lg flex flex-col-reverse mt-auto p-3 gap-2 overflow-auto h-full max-h-full'>
+			<div className='chat__main bg-[#333] w-full rounded-lg flex flex-col-reverse mt-auto p-3 gap-2 overflow-auto h-full max-h-full shadow-xl'>
 				{!!messages.length ? (
 					messages?.map(({ id, uid, content, fileURL }, index) => (
 						<ChatBubble
@@ -66,14 +68,18 @@ const ChatMain = ({ chat }) => {
 													src={file.ref}
 													alt='user image'
 													className='object-cover object-center w-[60px] h-[60px]'
-													onClick={() => setPreview({ ref: file.ref, type: file.type })}
+													onClick={() =>
+														setPreview({ ref: file.ref, type: file.type, name: file.name })
+													}
 												/>
 											);
 										return (
 											<div
 												key={file.ref}
 												className='h-[40px] rounded-lg px-3 py-2 grid place-items-center'
-												onClick={() => setPreview({ ref: file.ref, type: file.type })}
+												onClick={() =>
+													setPreview({ ref: file.ref, type: file.type, name: file.name })
+												}
 											>
 												<span href={file.ref} className='text-text cursor-pointer'>
 													{file.name}
@@ -92,32 +98,6 @@ const ChatMain = ({ chat }) => {
 					</div>
 				)}
 			</div>
-			{preview && (
-				<div
-					className='w-screen h-screen absolute top-0 left-0 bg-[#0009]'
-					onClick={() => setPreview(null)}
-				>
-					<div className='w-full h-[60px] bg-layer' onClick={(e) => e.stopPropagation()}>
-						<div className='w-full h-full max-w-7xl flex justify-end items-center p-5'>
-							<Link to={preview.ref}>
-								<Button>Download</Button>
-							</Link>
-						</div>
-					</div>
-					<div
-						className='w-max flex justify-center items-center flex-col m-auto text-text'
-						style={{ height: 'calc(100% - 60px)' }}
-					>
-						<div className='w-full h-ull grid place-items-center'>
-							{preview.type.startsWith('image/') ? (
-								<img src={preview.ref} className='max-w-[80vw] max-h-[80vh]' />
-							) : (
-								<span>File</span>
-							)}
-						</div>
-					</div>
-				</div>
-			)}
 		</>
 	);
 };
