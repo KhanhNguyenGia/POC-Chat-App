@@ -1,4 +1,4 @@
-const Avatar = ({ avaSize = 50, members }) => {
+const Avatar = ({ avaSize = 50, members, ...rest }) => {
 	switch (members.length) {
 		case 1:
 			return (
@@ -10,6 +10,7 @@ const Avatar = ({ avaSize = 50, members }) => {
 						minWidth: avaSize,
 						minHeight: avaSize,
 					}}
+					{...rest}
 				>
 					{members.map((member) =>
 						member?.photoURL ? (
@@ -48,6 +49,7 @@ const Avatar = ({ avaSize = 50, members }) => {
 						minWidth: avaSize,
 						minHeight: avaSize,
 					}}
+					{...rest}
 				>
 					{members.map((member) =>
 						member?.photoURL ? (
@@ -86,6 +88,7 @@ const Avatar = ({ avaSize = 50, members }) => {
 						minWidth: avaSize,
 						minHeight: avaSize,
 					}}
+					{...rest}
 				>
 					{members.map((member, index) =>
 						member?.photoURL ? (
@@ -124,6 +127,7 @@ const Avatar = ({ avaSize = 50, members }) => {
 						minWidth: avaSize,
 						minHeight: avaSize,
 					}}
+					{...rest}
 				>
 					{members.map((member) =>
 						member?.photoURL ? (

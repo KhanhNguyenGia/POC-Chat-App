@@ -20,9 +20,8 @@ import {
 	signInWithEmailAndPassword,
 	createUserWithEmailAndPassword,
 	FacebookAuthProvider,
-	signInWithRedirect,
 } from 'firebase/auth';
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { getStorage, ref, uploadBytes } from 'firebase/storage';
 
 const firebaseConfig = {
 	apiKey: 'AIzaSyBWdfeN1kOntlt7JIGjVaCgzCPNdP0mM1M',
@@ -169,12 +168,15 @@ export const searchUser = async (search, currentEmail) => {
 export const getChatMembers = async (chatId) => {
 	const docRef = doc(db, `/chats/${chatId}`);
 	const result = await getDoc(docRef);
+	if (!result.exists()) return;
 	return await result.data().members;
 };
 
-export const checkChatValid = async (chat) => {
+export const checkChatValid = async (chat, uid) => {
 	if (!chat) return false;
 	const docRef = doc(db, 'chats', chat);
 	const docSnap = await getDoc(docRef);
-	return docSnap.exists();
+	if (!docSnap.exists()) return false;
+	const members = await docSnap.data().membersId;
+	return members.includes(uid);
 };

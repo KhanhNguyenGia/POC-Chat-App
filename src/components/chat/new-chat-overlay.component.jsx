@@ -1,17 +1,61 @@
-import { useState } from 'react';
+import { debounce } from 'lodash';
+import { useCallback, useContext, useState } from 'react';
+import { AuthContext } from '../../context/auth.context';
+import {
+	checkChatExists,
+	createGroupChat,
+	createNewChat,
+	searchUser,
+} from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
 
-const NewChatOverlay = ({
-	setOpenNewChat,
-	onNewSearch,
-	newSearch,
-	found,
-	users,
-	onAddUser,
-	onNewGroupChat,
-	setUsers,
-	onNewChat,
-}) => {
+const NewChatOverlay = ({ setOpenNewChat }) => {
+	const { user } = useContext(AuthContext);
+	const [newSearch, setNewSearch] = useState('');
+	const [found, setFound] = useState([]);
+	const [users, setUsers] = useState([]);
+
+	const onAddUser = (user) => {
+		if (users.map((user) => user.uid).includes(user.uid)) return;
+		setUsers((prev) => [...prev, user]);
+	};
+
+	const onNewSearch = (e) => {
+		setNewSearch(e.target.value);
+		onSearchDebounce(e.target.value);
+	};
+
+	const onSearch = async (value) => {
+		const found = await searchUser(value, user.email);
+		setFound(found);
+	};
+
+	const onSearchDebounce = useCallback(
+		debounce((value) => onSearch(value), 300),
+		[]
+	);
+
+	const onNewChat = async (other) => {
+		if (!(await checkChatExists([user, other])) && user.email !== other.email) {
+			await createNewChat(user, other);
+		}
+		setFound([]);
+		setUsers([]);
+		setNewSearch('');
+		setOpenNewChat(false);
+	};
+
+	const onNewGroupChat = async (other) => {
+		const { displayName, uid, photoURL, email } = user;
+		if (!(await checkChatExists([user, ...other])) && user.email !== other.email) {
+			await createGroupChat([{ displayName, uid, email, photoURL }, ...other]);
+		}
+		setFound([]);
+		setUsers([]);
+		setNewSearch('');
+		setOpenNewChat(false);
+	};
+
 	const onSubmit = (e) => {
 		e.preventDefault();
 		if (!users.length) {
@@ -23,6 +67,7 @@ const NewChatOverlay = ({
 		}
 		onNewGroupChat(users);
 	};
+
 	return (
 		<div
 			className='absolute top-1/2 left-1/2 w-screen h-screen -translate-x-1/2 -translate-y-1/2 bg-[#0009] flex justify-center items-center'

@@ -1,19 +1,81 @@
-import { useContext, useState } from 'react';
-import { Outlet, useLocation } from 'react-router';
+import { useContext, useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import { GearIcon, ProfileIcon, SignOutIcon } from '../../assets/icon';
 import { AuthContext } from '../../context/auth.context';
 import { logoutUser } from '../../utils/firebase/firebase.utils';
+import Avatar from '../avatar/avatar.component';
 import Button from '../button/button.component';
+
+const ProfileMenuItem = ({
+	className = 'px-3 py-3 hover:bg-action transition-all cursor-pointer flex flex-row gap-3 items-center',
+	children,
+	...rest
+}) => (
+	<li className={className} {...rest}>
+		{children}
+	</li>
+);
+
+const ProfileMenu = ({ open, setOpen }) => {
+	const navigate = useNavigate();
+
+	const onExitOverlay = () => {
+		setOpen(false);
+	};
+
+	useEffect(() => {
+		document.addEventListener('click', onExitOverlay);
+		return () => {
+			document.removeEventListener('click', onExitOverlay);
+		};
+	}, []);
+
+	return (
+		<ul
+			className={`absolute top-full -right-2 bg-layer3 rounded-lg z-10 text-text py-3 w-[200px] flex flex-col ${
+				open ? 'visible opacity-100 top-[calc(100%_+_10px)]' : 'invisible opacity-0'
+			} transition-all font-normal text-xl shadow-xl`}
+		>
+			<ProfileMenuItem
+				className='px-3 py-3 hover:bg-action transition-all cursor-pointer flex flex-row gap-3 items-center'
+				onClick={() => {
+					setOpen(false);
+					navigate('/profile');
+				}}
+			>
+				<ProfileIcon />
+				Profile
+			</ProfileMenuItem>
+			<ProfileMenuItem
+				className='px-3 py-3 hover:bg-action transition-all cursor-pointer flex flex-row gap-3 items-center'
+				onClick={() => {
+					setOpen(false);
+					navigate('/setting');
+				}}
+			>
+				<GearIcon />
+				Setting
+			</ProfileMenuItem>
+			<ProfileMenuItem
+				className='px-3 py-3 hover:bg-action transition-all cursor-pointer flex flex-row gap-3 items-center'
+				onClick={logoutUser}
+			>
+				<SignOutIcon />
+				Sign out
+			</ProfileMenuItem>
+		</ul>
+	);
+};
 
 const NavBar = () => {
 	const { user } = useContext(AuthContext);
-	const [openProfile, setOpenProfile] = useState(false);
+	const [open, setOpen] = useState(false);
 	const location = useLocation();
 	const isAuth = location.pathname.match(/^\/register|^\/login/gm);
 
 	const onToggleProfile = () => {
-		setOpenProfile((prev) => !prev);
+		setOpen((prev) => !prev);
 	};
 
 	return (
@@ -24,51 +86,18 @@ const NavBar = () => {
 						<img src='/MyChat.svg' className='h-8' />
 					</Link>
 					{!isAuth && (
-						<div className='flex flex-row gap-5 items-center relative'>
+						<div
+							className='flex flex-row gap-5 items-center relative'
+							onClick={(e) => e.stopPropagation()}
+						>
 							{user ? (
 								<>
-									{user?.photoURL ? (
-										<img
-											src={user?.photoURL}
-											alt={'profile'}
-											width={40}
-											height={40}
-											className='object-cover object-center rounded-full cursor-pointer'
-											onClick={onToggleProfile}
-										/>
-									) : (
-										<div
-											className='text-text bg-action w-10 h-10 rounded-full flex justify-center items-center font-bold cursor-pointer'
-											onClick={onToggleProfile}
-										>
-											{user.email.charAt(0).toUpperCase()}
-										</div>
-									)}
-									{
-										<ul
-											className={`absolute top-full -right-2 bg-[#333] rounded-lg z-10 text-text py-3 w-[200px] flex flex-col ${
-												openProfile
-													? 'visible opacity-100 top-[calc(100%_+_10px)]'
-													: 'invisible opacity-0'
-											} transition-all font-normal text-xl shadow-xl`}
-										>
-											<li className='px-3 py-3 hover:bg-action transition-all cursor-pointer flex flex-row gap-3 items-center'>
-												<ProfileIcon />
-												Profile
-											</li>
-											<li className='px-3 py-3 hover:bg-action transition-all cursor-pointer flex flex-row gap-3 items-center'>
-												<GearIcon />
-												Setting
-											</li>
-											<li
-												className='px-3 py-3 hover:bg-action transition-all cursor-pointer flex flex-row gap-3 items-center'
-												onClick={logoutUser}
-											>
-												<SignOutIcon />
-												Sign out
-											</li>
-										</ul>
-									}
+									<Avatar
+										members={[user]}
+										className='rounded-full overflow-hidden cursor-pointer'
+										onClick={onToggleProfile}
+									/>
+									<ProfileMenu open={open} setOpen={setOpen} />
 								</>
 							) : (
 								<Link to='/login'>

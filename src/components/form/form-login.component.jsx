@@ -66,6 +66,7 @@ const RegisterForm = () => {
 	};
 
 	useEffect(() => {
+		document.title = 'Log In | MyChat';
 		const getRedirect = async () => {
 			try {
 				const result = await getRedirectResult(auth);

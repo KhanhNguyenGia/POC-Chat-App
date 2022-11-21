@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { uuidv4 } from '@firebase/util';
 import { AuthContext } from '../../context/auth.context';
 import { sendMessage, uploadFiles } from '../../utils/firebase/firebase.utils';
@@ -15,6 +15,7 @@ const ChatInput = () => {
 	const [message, setMessage] = useState('');
 	const [sending, setSending] = useState(false);
 	const [isDragged, setIsDragged] = useState(false);
+	const inputRef = useRef();
 
 	const onChange = (e) => {
 		setMessage(e.target.value);
@@ -88,6 +89,11 @@ const ChatInput = () => {
 	};
 
 	useEffect(() => {
+		if (sending) return;
+		inputRef.current.focus();
+	}, [sending]);
+
+	useEffect(() => {
 		document.addEventListener('dragover', onDragOver);
 		document.addEventListener('drop', onDrop);
 		document.addEventListener('click', onDrop);
@@ -139,6 +145,7 @@ const ChatInput = () => {
 						value={message}
 						className='w-full rounded-lg px-5 py-1 h-10 shadow-xl bg-gray-200 disabled:bg-slate-900'
 						disabled={sending}
+						ref={inputRef}
 					/>
 					<Button disabled={sending} onClick={onSendMessage}>
 						Send

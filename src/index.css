@@ -36,3 +36,12 @@ body {
 ::-webkit-scrollbar-thumb:hover {
 	background: #0092ca;
 }
+
+input {
+	background: #ddd;
+	height: 2.6rem;
+}
+
+input::placeholder {
+	color: #333d;
+}

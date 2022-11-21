@@ -1,17 +1,18 @@
 const DEFAULT_STYLE = 'rounded-lg text-text px-3 py-2 w-full';
 
 const ChatBubble = ({ current, children, belongsTo, same }) => {
-	const STYLE = `${DEFAULT_STYLE} ${current ? 'bg-primary' : 'bg-layer max-w-full'}`;
+	const STYLE = `${DEFAULT_STYLE} ${current ? 'bg-primary' : 'bg-layer3'}`;
 
 	return (
 		<div
-			className={`max-w-[75%] w-max ${
-				current ? 'self-end' : `flex-col flex gap-3 ${same ? 'pl-[52px]' : ''}`
+			className={`max-w-[75%] w-max ${same ? 'mt-8 last:mt-0' : ''} ${
+				current ? 'self-end' : `flex-col flex gap-3 ${!same ? 'pl-[52px]' : ''}`
 			}`}
 		>
+			{same && !current && <div className='truncate text-text'>{belongsTo?.email}</div>}
 			<div className='flex flex-row gap-3'>
-				{!current && !same && (
-					<div>
+				{!current && same && (
+					<div className='self-end'>
 						{belongsTo?.photoURL ? (
 							<img
 								src={belongsTo?.photoURL}
@@ -29,7 +30,6 @@ const ChatBubble = ({ current, children, belongsTo, same }) => {
 					{children}
 				</div>
 			</div>
-			{!current && !same && <div className='truncate text-text'>{belongsTo?.email}</div>}
 		</div>
 	);
 };
