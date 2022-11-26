@@ -80,9 +80,12 @@ const MORE_LIST = [
 			const onSubmit = async (e) => {
 				try {
 					e.preventDefault();
-					if (!color) return;
+					if (!color || theme === color) return;
 					const expendedColor = expandColorCode(color);
-					if (!expendedColor.match(/^([a-f0-9]{6}|[a-f0-9]{8})$/gim)) return;
+					if (!expendedColor.match(/^([a-f0-9]{6}|[a-f0-9]{8})$/gim)) {
+						toast.error('Invalid color code');
+						return;
+					}
 					dispatch({ type: CHAT_ACTION_TYPES.UPDATE_COLOR, payload: color });
 					await updateChatColor(chatId, color);
 					toast.success('Color has been updated');

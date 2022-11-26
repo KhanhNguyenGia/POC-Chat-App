@@ -79,6 +79,7 @@ const ChatBubble = ({ current, children, belongsTo, same, id }) => {
 		}
 		navigator.clipboard.writeText(children[1]);
 		setOpen(false);
+		toast.success('Copied to clipboard');
 	};
 
 	const onDelete = () => {
