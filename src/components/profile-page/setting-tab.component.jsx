@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import Button from '../button/button.component';
 import Switch from '../switch/switch.component';
 import { Label } from './basic-info-tab.component';
@@ -37,10 +38,14 @@ const SettingTab = () => {
 	const [settings, setSettings] = useState(SETTING_DEFAULT);
 
 	const onSubmit = (e) => {
-		e.preventDefault();
-		console.log(settings);
-		localStorage.setItem('settings', JSON.stringify(settings));
-		location.reload();
+		try {
+			e.preventDefault();
+			// console.log(settings);
+			localStorage.setItem('settings', JSON.stringify(settings));
+			location.reload();
+		} catch (error) {
+			toast.error('Failed to save settings');
+		}
 	};
 
 	const onTopSetChange = (e) => {

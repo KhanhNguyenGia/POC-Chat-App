@@ -21,7 +21,7 @@ import {
 	createUserWithEmailAndPassword,
 	FacebookAuthProvider,
 } from 'firebase/auth';
-import { getStorage, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { getMessaging, getToken } from 'firebase/messaging';
 
 const firebaseConfig = {
@@ -197,4 +197,17 @@ export const updateChatColor = async (chatId, value) => {
 	const result = await getDoc(docRef);
 	if (!result.exists()) return;
 	await updateDoc(docRef, { theme: value });
+};
+
+export const deleteMessage = async (chatId, messageId) => {
+	const messageRef = doc(db, `/chats/${chatId}/messages/${messageId}`);
+	const result = await getDoc(messageRef);
+	if (!result.exists()) return;
+	await updateDoc(messageRef, { content: 'Message removed', fileURL: [] });
+};
+
+export const removedFile = async (chatId, uuid) => {
+	if (!chatId || !uuid) return;
+	const fileRef = ref(storage, `/chats/${chatId}/${uuid}`);
+	return deleteObject(fileRef);
 };

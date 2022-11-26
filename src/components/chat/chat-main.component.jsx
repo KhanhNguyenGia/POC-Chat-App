@@ -7,6 +7,7 @@ import { ChatContext } from '../../context/chat.context';
 // import { ChatContext } from '../../context/chat.context';
 import { db, getChatMembers } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
+import Overlay from '../overlay/overlay.component';
 import ChatBubble from './chat-bubble.component';
 
 const ChatMain = ({ chat }) => {
@@ -75,6 +76,7 @@ const ChatMain = ({ chat }) => {
 					messages?.map(({ id, uid, content, fileURL }, index) => (
 						<ChatBubble
 							key={id}
+							id={id}
 							current={uid === user.uid}
 							belongsTo={members.find((member) => member.uid === uid)}
 							same={
@@ -84,11 +86,12 @@ const ChatMain = ({ chat }) => {
 							}
 						>
 							{!!fileURL?.length && (
-								<div>
+								<div className='flex cursor-pointer'>
 									{fileURL.map((file) => {
 										if (file.type.startsWith('image/'))
 											return (
 												<img
+													uuid={file.uuid}
 													key={file.ref}
 													src={file.ref}
 													alt='user image'
@@ -124,7 +127,7 @@ const ChatMain = ({ chat }) => {
 				)}
 			</div>
 			{preview && (
-				<div
+				<Overlay
 					className='w-screen h-screen absolute top-0 left-0 bg-[#0009] z-20 overflow-hidden'
 					onClick={() => setPreview(null)}
 				>
@@ -166,7 +169,7 @@ const ChatMain = ({ chat }) => {
 							)}
 						</div>
 					</div>
-				</div>
+				</Overlay>
 			)}
 		</>
 	);

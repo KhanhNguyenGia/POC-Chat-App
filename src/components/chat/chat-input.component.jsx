@@ -6,6 +6,7 @@ import Button from '../button/button.component';
 import { useParams } from 'react-router';
 import { ChatContext } from '../../context/chat.context';
 import { SendIcon } from '../../assets/icon';
+import { toast } from 'react-toastify';
 
 //{ message, onSendMessage, onChange, disabled, files, onRemove }
 const MAX_SIZE = 1000000;
@@ -26,13 +27,14 @@ const ChatInput = () => {
 
 	const onSendMessage = async (e) => {
 		e.preventDefault();
-		if (!user || !message) return;
+		if (!user) return;
 		setSending(true);
 		const { uid } = user;
 		const fileRefs =
 			files.length &&
 			(await Promise.all(
 				files.map(async (file) => ({
+					uuid: file.uuid,
 					name: file.name,
 					type: file.type,
 					ref: await uploadFiles(chat, file),
@@ -72,7 +74,7 @@ const ChatInput = () => {
 					reader.readAsDataURL(file);
 					reader.addEventListener('load', () => {
 						if (file.size > MAX_SIZE) {
-							alert('file is too big');
+							toast.error('File is too big');
 							return;
 						}
 						setFiles((prev) => [

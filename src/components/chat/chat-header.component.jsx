@@ -1,5 +1,6 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { toast } from 'react-toastify';
 import {
 	BackIcon,
 	BellIcon,
@@ -77,12 +78,17 @@ const MORE_LIST = [
 			};
 
 			const onSubmit = async (e) => {
-				e.preventDefault();
-				if (!color) return;
-				const expendedColor = expandColorCode(color);
-				if (!expendedColor.match(/^([a-f0-9]{6}|[a-f0-9]{8})$/gim)) return;
-				dispatch({ type: CHAT_ACTION_TYPES.UPDATE_COLOR, payload: color });
-				await updateChatColor(chatId, color);
+				try {
+					e.preventDefault();
+					if (!color) return;
+					const expendedColor = expandColorCode(color);
+					if (!expendedColor.match(/^([a-f0-9]{6}|[a-f0-9]{8})$/gim)) return;
+					dispatch({ type: CHAT_ACTION_TYPES.UPDATE_COLOR, payload: color });
+					await updateChatColor(chatId, color);
+					toast.success('Color has been updated');
+				} catch (error) {
+					toast.error('Failed to change color');
+				}
 			};
 
 			return (
@@ -134,7 +140,7 @@ const MoreList = ({ showExtra }) => {
 	return (
 		<CollapseList
 			list={MORE_LIST}
-			className={`absolute top-[calc(100%)] bg-layer3 shadow-xl text-text py-5 flex flex-col gap-5 transition-all rounded-lg max-w-xs ${
+			className={`absolute top-[calc(100%)] bg-layer3 shadow-xl text-text py-5 flex flex-col gap-5 transition-all rounded-lg max-w-xs z-20 ${
 				showExtra ? '-right-0 visible opacity-100' : '-right-20 opacity-0 invisible'
 			}`}
 		/>
@@ -167,7 +173,7 @@ const ChatHeader = () => {
 		};
 		const getChat = async () => {
 			const chatInfo = await getChatInfo(chatId);
-			console.log(chatInfo);
+			// console.log(chatInfo);
 			const theme = chatInfo.theme ?? '0092CA';
 			dispatch({ type: CHAT_ACTION_TYPES.UPDATE_COLOR, payload: theme });
 		};

@@ -1,5 +1,6 @@
 import { debounce } from 'lodash';
 import { useCallback, useContext, useState } from 'react';
+import { toast } from 'react-toastify';
 import { AuthContext } from '../../context/auth.context';
 import {
 	checkChatExists,
@@ -8,6 +9,7 @@ import {
 	searchUser,
 } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
+import Overlay from '../overlay/overlay.component';
 
 const NewChatOverlay = ({ setOpenNewChat }) => {
 	const { user } = useContext(AuthContext);
@@ -38,6 +40,9 @@ const NewChatOverlay = ({ setOpenNewChat }) => {
 	const onNewChat = async (other) => {
 		if (!(await checkChatExists([user, other])) && user.email !== other.email) {
 			await createNewChat(user, other);
+			toast.success('Chat has been created');
+		} else {
+			toast.error('Chat already exists');
 		}
 		setFound([]);
 		setUsers([]);
@@ -69,10 +74,7 @@ const NewChatOverlay = ({ setOpenNewChat }) => {
 	};
 
 	return (
-		<div
-			className='absolute top-1/2 left-1/2 w-screen h-screen -translate-x-1/2 -translate-y-1/2 bg-[#0009] flex justify-center items-center'
-			onClick={() => setOpenNewChat(false)}
-		>
+		<Overlay onClick={() => setOpenNewChat(false)}>
 			<form
 				className='bg-layer p-5 rounded-lg flex flex-col items-center gap-5 text-text'
 				onClick={(e) => e.stopPropagation()}
@@ -116,7 +118,7 @@ const NewChatOverlay = ({ setOpenNewChat }) => {
 					</div>
 				)}
 			</form>
-		</div>
+		</Overlay>
 	);
 };
 

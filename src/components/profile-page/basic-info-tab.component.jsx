@@ -28,7 +28,7 @@ const BasicInfoTab = () => {
 
 	const onSubmit = (e) => {
 		e.preventDefault();
-		console.log(form.current);
+		// console.log(form.current);
 		setEdit(false);
 	};
 
