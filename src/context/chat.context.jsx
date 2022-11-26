@@ -3,21 +3,18 @@ import { createContext, useReducer } from 'react';
 export const ChatContext = createContext();
 
 export const CHAT_ACTION_TYPES = {
-	SET_CHAT: 'CHAT/SET_CHAT',
-	CLEAR_CHAT: 'CHAT/CLEAR_CHAT',
+	UPDATE_COLOR: 'CHAT/UPDATE_COLOR',
 };
 
 export const DEFAULT_CHAT = {
-	chat: null,
+	theme: '0092CA',
 };
 
 export const chatReducer = (state, action) => {
 	const { type, payload } = action;
 	switch (type) {
-		case CHAT_ACTION_TYPES.SET_CHAT:
-			return { ...state, chat: payload };
-		case CHAT_ACTION_TYPES.CLEAR_CHAT:
-			return { ...state, chat: null };
+		case CHAT_ACTION_TYPES.UPDATE_COLOR:
+			return { ...state, theme: payload };
 		default:
 			return state;
 	}

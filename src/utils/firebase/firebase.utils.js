@@ -22,6 +22,7 @@ import {
 	FacebookAuthProvider,
 } from 'firebase/auth';
 import { getStorage, ref, uploadBytes } from 'firebase/storage';
+import { getMessaging, getToken } from 'firebase/messaging';
 
 const firebaseConfig = {
 	apiKey: 'AIzaSyBWdfeN1kOntlt7JIGjVaCgzCPNdP0mM1M',
@@ -44,6 +45,7 @@ export const auth = getAuth(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 export const facebookProvider = new FacebookAuthProvider();
+export const messaging = getMessaging(app);
 
 export const setUser = async (user) => {
 	const userRef = doc(db, `/users/${user.uid}`);
@@ -128,6 +130,7 @@ export const createNewChat = async (current, other) => {
 				a.uid.localeCompare(b.uid)
 			),
 			updated: Date.now(),
+			theme: '0092CA',
 		});
 	} catch (e) {
 		console.log(e);
@@ -142,6 +145,7 @@ export const createGroupChat = async (members) => {
 			membersId: members.map((member) => member.uid).sort(),
 			members: members.sort((a, b) => a.uid.localeCompare(b.uid)),
 			updated: Date.now(),
+			theme: '0092CA',
 		});
 	} catch (e) {
 		console.log(e);
@@ -179,4 +183,18 @@ export const checkChatValid = async (chat, uid) => {
 	if (!docSnap.exists()) return false;
 	const members = await docSnap.data().membersId;
 	return members.includes(uid);
+};
+
+export const getChatInfo = async (chatId) => {
+	const docRef = doc(db, `/chats/${chatId}`);
+	const result = await getDoc(docRef);
+	if (!result.exists()) return;
+	return await result.data();
+};
+
+export const updateChatColor = async (chatId, value) => {
+	const docRef = doc(db, `/chats/${chatId}`);
+	const result = await getDoc(docRef);
+	if (!result.exists()) return;
+	await updateDoc(docRef, { theme: value });
 };

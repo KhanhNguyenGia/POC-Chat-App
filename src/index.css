@@ -38,8 +38,9 @@ body {
 }
 
 input {
-	background: #ddd;
+	background: #ccc;
 	height: 2.6rem;
+	outline: none;
 }
 
 input::placeholder {

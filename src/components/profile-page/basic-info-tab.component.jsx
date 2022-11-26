@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { PencilIcon } from '../../assets/icon';
 import { AuthContext } from '../../context/auth.context';
 import Avatar from '../avatar/avatar.component';
@@ -6,10 +6,10 @@ import Button from '../button/button.component';
 
 const BIG_IMAGE_SIZE = 320;
 
-const Label = ({ children, ...rest }) => (
-	<div className='text-gray-400 text-lg font-normal' {...rest}>
+export const Label = ({ children, ...rest }) => (
+	<label className='text-gray-400 text-lg font-normal' {...rest}>
 		{children}
-	</div>
+	</label>
 );
 
 const Content = ({ children, ...rest }) => (
@@ -22,11 +22,13 @@ const BasicInfoTab = () => {
 	const { user } = useContext(AuthContext);
 	const { uid, photoURL, displayName, email } = user;
 	const [edit, setEdit] = useState(false);
-	const [form, setForm] = useState({ email, displayName });
+	// const [form, setForm] = useState({ email, displayName });
+	const form = useRef({ email, displayName });
 	const bigPhotoURL = photoURL?.replace('s96-c', `s${BIG_IMAGE_SIZE}-c`) || null;
 
 	const onSubmit = (e) => {
 		e.preventDefault();
+		console.log(form.current);
 		setEdit(false);
 	};
 
@@ -55,6 +57,7 @@ const BasicInfoTab = () => {
 									value={form.email}
 									className='px-3 rounded-lg font-semibold'
 									placeholder={email}
+									onChange={(e) => (form.current.email = e.target.value)}
 								/>
 							)}
 						</div>
@@ -70,6 +73,7 @@ const BasicInfoTab = () => {
 									value={form.displayName}
 									className='px-3 rounded-lg font-semibold'
 									placeholder={displayName || 'CoolName123'}
+									onChange={(e) => (form.current.displayName = e.target.value)}
 								/>
 							)}
 						</div>

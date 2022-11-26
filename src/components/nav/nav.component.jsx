@@ -51,7 +51,7 @@ const ProfileMenu = ({ open, setOpen }) => {
 				className='px-3 py-3 hover:bg-action transition-all cursor-pointer flex flex-row gap-3 items-center'
 				onClick={() => {
 					setOpen(false);
-					navigate('/setting');
+					navigate('/profile/settings');
 				}}
 			>
 				<GearIcon />
@@ -96,6 +96,7 @@ const NavBar = () => {
 										members={[user]}
 										className='rounded-full overflow-hidden cursor-pointer'
 										onClick={onToggleProfile}
+										avaSize={40}
 									/>
 									<ProfileMenu open={open} setOpen={setOpen} />
 								</>

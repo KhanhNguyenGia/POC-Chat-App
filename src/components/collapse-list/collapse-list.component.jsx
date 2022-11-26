@@ -25,7 +25,7 @@ const CollapseList = ({ list, className, ...rest }) => {
 						<div
 							className={`${open === index ? 'h-max visible' : 'h-0 invisible overflow-hidden'}`}
 						>
-							{item.content}
+							{item.content()}
 						</div>
 					</li>
 				</Fragment>

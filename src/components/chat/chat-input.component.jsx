@@ -4,12 +4,15 @@ import { AuthContext } from '../../context/auth.context';
 import { sendMessage, uploadFiles } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
 import { useParams } from 'react-router';
+import { ChatContext } from '../../context/chat.context';
+import { SendIcon } from '../../assets/icon';
 
 //{ message, onSendMessage, onChange, disabled, files, onRemove }
 const MAX_SIZE = 1000000;
 
 const ChatInput = () => {
 	const { user } = useContext(AuthContext);
+	const { theme } = useContext(ChatContext);
 	const { chatId: chat } = useParams();
 	const [files, setFiles] = useState([]);
 	const [message, setMessage] = useState('');
@@ -23,7 +26,7 @@ const ChatInput = () => {
 
 	const onSendMessage = async (e) => {
 		e.preventDefault();
-		if (!user) return;
+		if (!user || !message) return;
 		setSending(true);
 		const { uid } = user;
 		const fileRefs =
@@ -143,12 +146,12 @@ const ChatInput = () => {
 					<input
 						onChange={onChange}
 						value={message}
-						className='w-full rounded-lg px-5 py-1 h-10 shadow-xl bg-gray-200 disabled:bg-slate-900'
+						className='w-full rounded-lg px-5 py-1 h-10 shadow-xl bg-gray-200 disabled:bg-slate-600'
 						disabled={sending}
 						ref={inputRef}
 					/>
-					<Button disabled={sending} onClick={onSendMessage}>
-						Send
+					<Button disabled={sending} onClick={onSendMessage} style={{ background: '#' + theme }}>
+						<SendIcon className='stroke-white' />
 					</Button>
 				</div>
 			</form>

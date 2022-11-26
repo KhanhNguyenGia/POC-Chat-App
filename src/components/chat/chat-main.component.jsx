@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ZoomInIcon, ZoomOutIcon } from '../../assets/icon';
 // import { Link, useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/auth.context';
+import { ChatContext } from '../../context/chat.context';
 // import { ChatContext } from '../../context/chat.context';
 import { db, getChatMembers } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
@@ -10,7 +11,7 @@ import ChatBubble from './chat-bubble.component';
 
 const ChatMain = ({ chat }) => {
 	// const { chatId: chat } = useParams();
-	// const { chat } = useContext(ChatContext);
+	const { theme } = useContext(ChatContext);
 	const [messages, setMessages] = useState([]);
 	const { user } = useContext(AuthContext);
 	const [members, setMembers] = useState([]);
@@ -138,7 +139,7 @@ const ChatMain = ({ chat }) => {
 								</Button>
 							</div>
 							<a href={preview.ref} target='_blank' download>
-								<Button>Download</Button>
+								<Button style={{ background: '#' + theme }}>Download</Button>
 							</a>
 						</div>
 					</div>

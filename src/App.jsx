@@ -3,7 +3,7 @@ import { useContext, useEffect, Suspense, lazy, useState } from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router';
 import './App.css';
 import { AuthContext, AUTH_ACTION_TYPES } from './context/auth.context';
-import { auth, checkChatValid } from './utils/firebase/firebase.utils';
+import { auth, checkChatValid, getChatInfo } from './utils/firebase/firebase.utils';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 const NavBar = lazy(() => import('./components/nav/nav.component'));
@@ -11,6 +11,7 @@ const Chat = lazy(() => import('./components/chat/chat.component'));
 const LogInForm = lazy(() => import('./components/form/form-login.component'));
 const RegisterForm = lazy(() => import('./components/form/form-register.component'));
 import Spinner from './components/spinner/spinner.component';
+import { ChatProvider } from './context/chat.context';
 const ChatHeader = lazy(() => import('./components/chat/chat-header.component'));
 const ChatMain = lazy(() => import('./components/chat/chat-main.component'));
 const ChatInput = lazy(() => import('./components/chat/chat-input.component'));
@@ -41,11 +42,11 @@ const ChatGuard = () => {
 	}
 	if (!chatValid) return <Navigate to='/chat' />;
 	return (
-		<>
+		<ChatProvider>
 			<ChatHeader />
 			<ChatMain chat={chatId} />
 			<ChatInput />
-		</>
+		</ChatProvider>
 	);
 };
 
@@ -107,15 +108,6 @@ function App() {
 								<Route index element={<BasicInfoTab />} />
 								<Route path='settings' element={<SettingTab />} />
 							</Route>
-							<Route
-								path='/setting'
-								element={
-									<AuthGuard
-										auth={<div className='text-text font-bold text-4xl'>Setting</div>}
-										unAuth={<Navigate to='/' />}
-									/>
-								}
-							/>
 							<Route path='*' element={<ErrorPage code={404} />} />
 						</Route>
 					</Routes>

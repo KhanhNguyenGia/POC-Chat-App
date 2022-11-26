@@ -15,7 +15,7 @@ const Button = ({
 		case BUTTON_TYPES.primary:
 			return (
 				<button
-					className={`bg-primary text-text flex-1 px-5 py-2 rounded-md text-md font-medium hover:bg-action transition-all active:opacity-80 disabled:bg-slate-900 shadow-xl ${className}`}
+					className={`bg-primary text-text flex-1 px-5 py-2 rounded-md text-md font-medium hover:opacity-80 transition-all active:opacity-80 disabled:bg-slate-900 shadow-xl ${className}`}
 					type={type}
 					{...rest}
 				>
@@ -25,7 +25,7 @@ const Button = ({
 		case BUTTON_TYPES.secondary:
 			return (
 				<button
-					className={`border-primary border-2 text-text flex-1 px-5 py-2 rounded-md text-md font-medium hover:bg-slate-700 transition-all active:opacity-80 disabled:bg-slate-900 shadow-xl ${className}`}
+					className={`border-primary border-2 text-text flex-1 px-5 py-2 rounded-md text-md font-medium hover:opacity-80 transition-all active:opacity-80 disabled:bg-slate-900 shadow-xl ${className}`}
 					type={type}
 					{...rest}
 				>

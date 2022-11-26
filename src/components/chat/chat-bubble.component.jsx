@@ -1,7 +1,10 @@
-const DEFAULT_STYLE = 'rounded-lg text-text px-3 py-2 w-full';
+import { useContext } from 'react';
+import { ChatContext } from '../../context/chat.context';
+
+const DEFAULT_STYLE = 'rounded-lg text-text px-3 py-2 max-w-full';
 
 const ChatBubble = ({ current, children, belongsTo, same }) => {
-	const STYLE = `${DEFAULT_STYLE} ${current ? 'bg-primary' : 'bg-layer3'}`;
+	const { theme } = useContext(ChatContext);
 
 	return (
 		<div
@@ -26,7 +29,10 @@ const ChatBubble = ({ current, children, belongsTo, same }) => {
 						)}
 					</div>
 				)}
-				<div className={STYLE} style={{ wordWrap: 'break-word' }}>
+				<div
+					className={DEFAULT_STYLE}
+					style={{ wordWrap: 'break-word', background: current ? '#' + theme : '#333' }}
+				>
 					{children}
 				</div>
 			</div>
