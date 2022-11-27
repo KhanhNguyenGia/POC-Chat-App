@@ -12,6 +12,15 @@ import Spinner from '../spinner/spinner.component';
 //{ message, onSendMessage, onChange, disabled, files, onRemove }
 const MAX_SIZE = 1000000;
 
+const FilePreviewRemoveIcon = ({ onRemove, index }) => (
+	<div
+		className='absolute w-7 h-7 -top-3 -right-3 bg-gray-500 rounded-full text-text text-lg font-bold leading-0 cursor-pointer hover:bg-red-500 flex justify-center items-center transition-all'
+		onClick={() => onRemove(index)}
+	>
+		x
+	</div>
+);
+
 const ChatInput = () => {
 	const { user } = useContext(AuthContext);
 	const { theme } = useContext(ChatContext);
@@ -131,22 +140,39 @@ const ChatInput = () => {
 						{files.map((file, index) => {
 							if (file.type.startsWith('image/')) {
 								return (
-									<img
-										key={index}
-										className='object-cover object-center rounded-lg w-[40px] h-[40px] shadow-xl'
-										src={file.url}
-										alt={file.name}
-										onClick={() => onRemove(index)}
-									/>
+									<div key={index} className='relative hover:opacity-80'>
+										<FilePreviewRemoveIcon onRemove={onRemove} index={index} />
+										<a
+											href={file.url}
+											className='text-text'
+											onClick={(e) => e.stopPropagation()}
+											download
+										>
+											<img
+												key={index}
+												className='block object-cover object-center rounded-lg w-[60px] h-[60px] shadow-xl'
+												src={file.url}
+												alt={file.name}
+											/>
+										</a>
+									</div>
 								);
 							}
 							return (
 								<div
 									key={index}
-									className='h-[40px] rounded-lg bg-[#444] px-3 py-2 grid place-items-center shadow-xl'
-									onClick={() => onRemove(index)}
+									className='h-[60px] rounded-lg px-3 py-2 grid place-items-center shadow-xl relative hover:opacity-80'
+									style={{
+										background: '#' + theme,
+									}}
 								>
-									<a href={file.url} className='text-text'>
+									<FilePreviewRemoveIcon onRemove={onRemove} index={index} />
+									<a
+										href={file.url}
+										className='text-text'
+										onClick={(e) => e.stopPropagation()}
+										download
+									>
 										{file.name}
 									</a>
 								</div>

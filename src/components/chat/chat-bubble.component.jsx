@@ -153,10 +153,10 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 			return;
 		}
 		if (!children[1]) {
-			toast.info('Can not copy image file');
+			toast.info('Can not copy message with file');
 			return;
 		}
-		navigator.clipboard.writeText(children[1]);
+		navigator.clipboard.writeText(children[1].props.children);
 		setOpen(false);
 		toast.success('Copied to clipboard');
 	};
@@ -201,13 +201,9 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 	return (
 		<>
 			<div
-				className={`
-					max-w-[75%] w-max relative select-none transition-all
-					${dateOpen && 'mb-10'}
-					${same ? 'mt-8 last:mt-0' : ''} ${
-					current ? 'self-end' : `flex-col flex gap-3 ${!same ? 'pl-[52px]' : ''}`
-				} 
-				`}
+				className={`max-w-[75%] w-max relative select-none transition-all ${dateOpen && 'mb-10'} ${
+					same ? 'mt-8 last:mt-0' : ''
+				} ${current ? 'self-end' : `flex-col flex gap-3 ${!same ? 'pl-[52px]' : ''}`}`}
 			>
 				{same && !current && <div className='truncate text-text'>{belongsTo?.email}</div>}
 				<div className='flex flex-row gap-3'>
@@ -227,10 +223,9 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 						</div>
 					)}
 					<div
-						className={`rounded-lg text-text px-3 py-2 max-w-full relative xs:select-text ${
+						className={`rounded-lg text-text max-w-full relative xs:select-text ${
 							removedAt && 'italic text-[#ddd]'
-						}
-						`}
+						}`}
 						style={{
 							wordWrap: 'break-word',
 							background: dateOpen ? '#' + theme : current ? '#' + theme : '#333',

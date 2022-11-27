@@ -1,6 +1,6 @@
 import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useContext, useEffect, useState } from 'react';
-import { ZoomInIcon, ZoomOutIcon } from '../../assets/icon';
+import { DocumentIcon, ZoomInIcon, ZoomOutIcon } from '../../assets/icon';
 // import { Link, useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/auth.context';
 import { ChatContext } from '../../context/chat.context';
@@ -88,7 +88,7 @@ const ChatMain = ({ chat }) => {
 							removedAt={removedAt}
 						>
 							{!!fileURL?.length && (
-								<div className='flex cursor-pointer'>
+								<div className='flex cursor-pointer flex-wrap justify-end'>
 									{fileURL.map((file) => {
 										if (file.type.startsWith('image/'))
 											return (
@@ -97,7 +97,8 @@ const ChatMain = ({ chat }) => {
 													key={file.ref}
 													src={file.ref}
 													alt='user image'
-													className='object-cover object-center w-[60px] h-[60px]'
+													className='object-cover object-center w-1/2 max-h-[200px] flex-auto rounded-lg hover:opacity-80'
+													style={{ borderColor: '#' + theme }}
 													onClick={() =>
 														setPreview({ ref: file.ref, type: file.type, name: file.name })
 													}
@@ -107,11 +108,12 @@ const ChatMain = ({ chat }) => {
 											<div
 												uuid={file.uuid}
 												key={file.ref}
-												className='h-[40px] rounded-lg px-3 py-2 grid place-items-center'
+												className='rounded-lg px-4 py-3 flex gap-3'
 												onClick={() =>
 													setPreview({ ref: file.ref, type: file.type, name: file.name })
 												}
 											>
+												<DocumentIcon />
 												<span href={file.ref} className='text-text cursor-pointer'>
 													{file.name}
 												</span>
@@ -120,7 +122,7 @@ const ChatMain = ({ chat }) => {
 									})}
 								</div>
 							)}
-							{content}
+							{content && <div className='px-3 py-2'>{content}</div>}
 						</ChatBubble>
 					))
 				) : (
