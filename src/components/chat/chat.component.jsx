@@ -19,9 +19,9 @@ const Chat = () => {
 			where('membersId', 'array-contains', `${user.uid}`)
 		);
 		const orderQ = query(memQ, orderBy('updated', 'desc'));
-		const unsubscribeFromChatList = onSnapshot(orderQ, (docs) => {
+		const unsubscribeFromChatList = onSnapshot(orderQ, (snapshot) => {
 			setChats((prev) =>
-				docs.docs.map((doc, index) => ({
+				snapshot.docs.map((doc, index) => ({
 					...doc.data(),
 					id: doc.id,
 					read: doc.id === chat,

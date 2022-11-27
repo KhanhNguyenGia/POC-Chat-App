@@ -109,9 +109,9 @@ const ChatMain = ({ chat }) => {
 	useEffect(() => {
 		const unsubscribeFromChat = onSnapshot(
 			query(collection(db, `/chats/${chat}/messages`), limit(50), orderBy('sent', 'desc')),
-			(docs) => {
+			(snapshot) => {
 				setMessages(
-					docs.docs.map((doc) => {
+					snapshot.docs.map((doc) => {
 						return {
 							...doc.data(),
 							id: doc.id,
