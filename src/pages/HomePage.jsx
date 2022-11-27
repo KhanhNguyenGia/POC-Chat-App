@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 const HomePage = () => {
 	useEffect(() => {
@@ -7,12 +7,13 @@ const HomePage = () => {
 	}, []);
 
 	return (
-		<div className='text-text font-bold text-4xl'>
-			<h1>Homepage</h1>
-			<Link to={'/chat'}>
-				<button>Chat</button>
-			</Link>
-		</div>
+		// <div className='text-text font-bold text-4xl'>
+		// 	<h1>Homepage</h1>
+		// 	<Link to={'/chat'}>
+		// 		<button>Chat</button>
+		// 	</Link>
+		// </div>
+		<Navigate to='/chat' replace />
 	);
 };
 
