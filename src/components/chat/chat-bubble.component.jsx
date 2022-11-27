@@ -89,11 +89,11 @@ const DateOpen = ({ removedAt, sentAt, current }) => {
 			}`}
 		>
 			<div>
-				Sent: <ReactTimeAgo date={new Date(sentAt)} timeStyle='mini-minute-now' />
+				Sent <ReactTimeAgo date={new Date(sentAt)} timeStyle='mini-minute-now' /> ago
 			</div>
 			{removedAt && (
 				<div>
-					Removed at: <ReactTimeAgo date={new Date(removedAt)} timeStyle='mini-minute-now' />
+					Removed <ReactTimeAgo date={new Date(removedAt)} timeStyle='mini-minute-now' /> ago
 				</div>
 			)}
 		</div>
@@ -201,7 +201,7 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 	return (
 		<>
 			<div
-				className={`max-w-[75%] w-max relative select-none transition-all ${dateOpen && 'mb-10'} ${
+				className={`max-w-[75%] w-max relative select-none transition-all ${dateOpen && 'mb-16'} ${
 					same ? 'mt-8 last:mt-0' : ''
 				} ${current ? 'self-end' : `flex-col flex gap-3 ${!same ? 'pl-[52px]' : ''}`}`}
 			>
