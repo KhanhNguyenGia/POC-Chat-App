@@ -1,15 +1,21 @@
-import { useContext, useState } from 'react';
+import _ from 'lodash';
+import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import ReactTimeAgo from 'react-time-ago';
 import { toast } from 'react-toastify';
 import { DeleteIcon, DocumentIcon, MoreIcon, ReplyIcon } from '../../assets/icon';
 import { ChatContext } from '../../context/chat.context';
 import { deleteMessage, removedFile } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
 import Overlay from '../overlay/overlay.component';
+import Spinner from '../spinner/spinner.component';
 
 const ChatBubbleOption = ({ children, ...rest }) => {
 	return (
-		<div className='hover:bg-action w-full px-3 py-2 cursor-pointer flex flex-row gap-3' {...rest}>
+		<div
+			className='hover:bg-action w-full px-3 py-2 cursor-pointer flex flex-row gap-3 active:opacity-80'
+			{...rest}
+		>
 			{children}
 		</div>
 	);
@@ -17,9 +23,11 @@ const ChatBubbleOption = ({ children, ...rest }) => {
 
 const DeleteOverlay = ({ setDeleteOpen, messageId, filesIDs }) => {
 	const { chatId } = useParams();
+	const [loading, setLoading] = useState(false);
 
 	const onDelete = async () => {
 		try {
+			setLoading(true);
 			await deleteMessage(chatId, messageId);
 			if (filesIDs) {
 				await Promise.all(filesIDs.map((file) => removedFile(chatId, file)));
@@ -28,6 +36,7 @@ const DeleteOverlay = ({ setDeleteOpen, messageId, filesIDs }) => {
 		} catch (error) {
 			toast.error('Failed to delete files');
 		}
+		setLoading(false);
 		setDeleteOpen(false);
 	};
 
@@ -45,14 +54,21 @@ const DeleteOverlay = ({ setDeleteOpen, messageId, filesIDs }) => {
 					<li>- Removed message can not be recovered.</li>
 				</ul>
 				<div className='flex gap-5'>
-					<Button color='primary' type='button' className='bg-red-600' onClick={onDelete}>
-						Confirm
+					<Button
+						color='primary'
+						type='button'
+						className='bg-red-600 disabled:bg-red-800'
+						onClick={onDelete}
+						disabled={loading}
+					>
+						{loading ? <Spinner size='w-7 h-7' /> : 'Delete'}
 					</Button>
 					<Button
 						color='secondary'
-						className='border-red-600'
+						className='border-red-600 disabled:bg-transparent disabled:border-red-800'
 						type='button'
 						onClick={() => setDeleteOpen(false)}
+						disabled={loading}
 					>
 						Cancel
 					</Button>
@@ -62,11 +78,74 @@ const DeleteOverlay = ({ setDeleteOpen, messageId, filesIDs }) => {
 	);
 };
 
-const ChatBubble = ({ current, children, belongsTo, same, id }) => {
+const DateOpen = ({ removedAt, sentAt, current }) => {
+	// const today = Date.now();
+	// const sentDate = new Date(sentAt);
+	// const removeDate = removedAt ? new Date(removedAt) : null;
+	return (
+		<div
+			className={`w-max absolute top-[calc(100%_+_10px)] flex flex-col gap-2 text-sm font-light text-gray-400 ${
+				current ? 'right-0 text-right' : 'left-0 text-left'
+			}`}
+		>
+			<div>
+				Sent: <ReactTimeAgo date={new Date(sentAt)} timeStyle='mini-minute-now' />
+			</div>
+			{removedAt && (
+				<div>
+					Removed at: <ReactTimeAgo date={new Date(removedAt)} timeStyle='mini-minute-now' />
+				</div>
+			)}
+		</div>
+	);
+};
+
+const BubbleMenu = ({ setOpen, current, open, onDelete, onCopy }) => (
+	<div
+		onClick={(e) => e.stopPropagation()}
+		onMouseEnter={() => setOpen(true)}
+		onMouseLeave={() => setOpen(false)}
+		className={`absolute top-1/2 -translate-y-1/2 transition-all duration-200 ${
+			open ? 'opacity-100 z-50' : 'opacity-0'
+		} z-10 ${current ? 'right-[calc(100%_+_10px)]' : 'left-[calc(100%_+_10px)]'}`}
+		style={{ fontStyle: 'normal' }}
+	>
+		<MoreIcon className='stroke-white cursor-pointer stroke-2' />
+		{open && (
+			<div
+				className={`absolute bottom-[calc(100%_+_4px)] py-3 rounded-lg  ${
+					current
+						? '-right-[200%] before:-translate-x-1/2  before:left-1/2'
+						: '-left-[150%] before:right-1/2 before:translate-x-1/2'
+				} bg-layer3 text-text w-max before:absolute before:top-full before:border-transparent before:border-[12px] before:border-t-layer3 flex flex-col gap-3 shadow-xl`}
+			>
+				{current && (
+					<ChatBubbleOption onClick={onDelete}>
+						<DeleteIcon />
+						Remove
+					</ChatBubbleOption>
+				)}
+				<ChatBubbleOption>
+					<ReplyIcon />
+					Reply
+				</ChatBubbleOption>
+				<ChatBubbleOption onClick={onCopy}>
+					<DocumentIcon />
+					Copy
+				</ChatBubbleOption>
+			</div>
+		)}
+	</div>
+);
+
+const TOUCH_DURATION = 500;
+
+const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt }) => {
 	const { theme } = useContext(ChatContext);
 	const [open, setOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
-	const removed = children[1] === 'Message removed';
+	const [dateOpen, setDateOpen] = useState(false);
+	let timer = null;
 
 	const onCopy = () => {
 		if (!navigator || !navigator.clipboard) {
@@ -87,12 +166,48 @@ const ChatBubble = ({ current, children, belongsTo, same, id }) => {
 		setOpen(false);
 	};
 
+	const touchStart = (e) => {
+		if (removedAt) return;
+		if (!timer) {
+			timer = setTimeout(onLongTouch, TOUCH_DURATION);
+		}
+	};
+
+	const touchEnd = () => {
+		if (removedAt) return;
+		if (timer) {
+			clearTimeout(timer);
+			timer = null;
+		}
+	};
+
+	const onLongTouch = () => {
+		timer = null;
+		setOpen(true);
+	};
+
+	const onCloseMenuOption = () => {
+		setOpen(false);
+		setDateOpen(false);
+	};
+
+	useEffect(() => {
+		document.addEventListener('click', onCloseMenuOption);
+		return () => {
+			document.removeEventListener('click', onCloseMenuOption);
+		};
+	}, []);
+
 	return (
 		<>
 			<div
-				className={`max-w-[75%] w-max ${same ? 'mt-8 last:mt-0' : ''} ${
+				className={`
+					max-w-[75%] w-max relative select-none transition-all
+					${dateOpen && 'mb-10'}
+					${same ? 'mt-8 last:mt-0' : ''} ${
 					current ? 'self-end' : `flex-col flex gap-3 ${!same ? 'pl-[52px]' : ''}`
-				} relative`}
+				} 
+				`}
 			>
 				{same && !current && <div className='truncate text-text'>{belongsTo?.email}</div>}
 				<div className='flex flex-row gap-3'>
@@ -112,50 +227,31 @@ const ChatBubble = ({ current, children, belongsTo, same, id }) => {
 						</div>
 					)}
 					<div
-						className={`rounded-lg text-text px-3 py-2 max-w-full relative ${
-							removed && 'italic text-[#bbb]'
-						}`}
+						className={`rounded-lg text-text px-3 py-2 max-w-full relative xs:select-text ${
+							removedAt && 'italic text-[#ddd]'
+						}
+						`}
 						style={{
 							wordWrap: 'break-word',
-							background: current ? '#' + theme : '#333',
+							background: dateOpen ? '#' + theme : current ? '#' + theme : '#333',
+						}}
+						onTouchStart={touchStart}
+						onTouchEnd={touchEnd}
+						onClick={(e) => {
+							e.stopPropagation();
+							setDateOpen((prev) => !prev);
 						}}
 					>
+						{dateOpen && <DateOpen removedAt={removedAt} sentAt={sentAt} current={current} />}
 						{children}
-						{!removed && (
-							<div
-								onMouseEnter={() => setOpen(true)}
-								onMouseLeave={() => setOpen(false)}
-								className={`absolute top-1/2 -translate-y-1/2 opacity-0 hover:opacity-100 z-10 ${
-									current ? 'right-[calc(100%_+_10px)]' : 'left-[calc(100%_+_10px)]'
-								}`}
-								style={{ fontStyle: 'normal' }}
-							>
-								<MoreIcon className='stroke-white cursor-pointer stroke-2' />
-								{open && (
-									<div
-										className={`absolute bottom-[calc(100%_+_10px)] py-3 rounded-lg  ${
-											current
-												? '-right-[200%] before:-translate-x-1/2  before:left-1/2'
-												: '-left-[150%] before:right-1/2 before:translate-x-1/2'
-										} bg-layer3 text-text w-max before:absolute before:top-full before:border-transparent before:border-[12px] before:border-t-layer3 flex flex-col gap-3 shadow-xl`}
-									>
-										{current && (
-											<ChatBubbleOption onClick={onDelete}>
-												<DeleteIcon />
-												Remove
-											</ChatBubbleOption>
-										)}
-										<ChatBubbleOption>
-											<ReplyIcon />
-											Reply
-										</ChatBubbleOption>
-										<ChatBubbleOption onClick={onCopy}>
-											<DocumentIcon />
-											Copy
-										</ChatBubbleOption>
-									</div>
-								)}
-							</div>
+						{!removedAt && (
+							<BubbleMenu
+								setOpen={setOpen}
+								current={current}
+								open={open}
+								onDelete={onDelete}
+								onCopy={onCopy}
+							/>
 						)}
 					</div>
 				</div>

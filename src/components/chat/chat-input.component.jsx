@@ -5,8 +5,9 @@ import { sendMessage, uploadFiles } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
 import { useParams } from 'react-router';
 import { ChatContext } from '../../context/chat.context';
-import { SendIcon } from '../../assets/icon';
+import { SendIcon, UploadIcon } from '../../assets/icon';
 import { toast } from 'react-toastify';
+import Spinner from '../spinner/spinner.component';
 
 //{ message, onSendMessage, onChange, disabled, files, onRemove }
 const MAX_SIZE = 1000000;
@@ -63,6 +64,27 @@ const ChatInput = () => {
 		setIsDragged(true);
 	};
 
+	const renderPreview = (file) => {
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.addEventListener('load', (e) => {
+			if (file.size > MAX_SIZE) {
+				toast.error('File is too big');
+				return;
+			}
+			setFiles((prev) => [
+				...prev,
+				{
+					uuid: uuidv4() + '.' + file.name.split('.').pop(),
+					name: file.name,
+					type: file.type,
+					url: reader.result,
+					file: file,
+				},
+			]);
+		});
+	};
+
 	const onDrop = (e) => {
 		e.preventDefault();
 		setIsDragged(false);
@@ -70,26 +92,16 @@ const ChatInput = () => {
 			[...e.dataTransfer.items].forEach((item, i) => {
 				if (item.kind === 'file') {
 					const file = item.getAsFile();
-					const reader = new FileReader();
-					reader.readAsDataURL(file);
-					reader.addEventListener('load', () => {
-						if (file.size > MAX_SIZE) {
-							toast.error('File is too big');
-							return;
-						}
-						setFiles((prev) => [
-							...prev,
-							{
-								uuid: uuidv4() + '.' + file.name.split('.').pop(),
-								name: file.name,
-								type: file.type,
-								url: reader.result,
-								file: file,
-							},
-						]);
-					});
+					console.log(file);
+					renderPreview(file);
 				}
 			});
+		}
+	};
+
+	const onManualUpload = (e) => {
+		for (let file of e.target.files) {
+			renderPreview(file);
 		}
 	};
 
@@ -101,12 +113,10 @@ const ChatInput = () => {
 	useEffect(() => {
 		document.addEventListener('dragover', onDragOver);
 		document.addEventListener('drop', onDrop);
-		document.addEventListener('click', onDrop);
 
 		return () => {
 			document.removeEventListener('dragover', onDragOver);
 			document.removeEventListener('drop', onDrop);
-			document.removeEventListener('click', onDrop);
 		};
 	}, []);
 
@@ -145,19 +155,43 @@ const ChatInput = () => {
 					</div>
 				)}
 				<div className='w-full flex justify-center items-center gap-3'>
+					<label
+						htmlFor='file-upload'
+						className='h-full rounded-lg overflow-hidden w-10 cursor-pointer relative border-[2px] p-0.5 active:opacity-80 hover:opacity-80'
+						style={{
+							color: '#' + theme,
+							borderColor: '#' + theme,
+						}}
+					>
+						<UploadIcon className='block w-full h-full m-auto' />
+						<input
+							id='file-upload'
+							name='file-upload'
+							type='file'
+							className='absolute h-0 w-0 opacity-0'
+							multiple
+							values={files}
+							onChange={onManualUpload}
+						/>
+					</label>
 					<input
 						onChange={onChange}
 						value={message}
 						className='w-full rounded-lg px-5 py-1 h-10 shadow-xl bg-gray-200 disabled:bg-slate-600'
-						disabled={sending}
 						ref={inputRef}
+						readOnly={sending}
 					/>
 					<Button disabled={sending} onClick={onSendMessage} style={{ background: '#' + theme }}>
-						<SendIcon className='stroke-white' />
+						{sending ? <Spinner size='w-6 h-6' /> : <SendIcon className='stroke-white stroke-2' />}
 					</Button>
 				</div>
 			</form>
-			{isDragged && <div className='w-screen h-screen absolute top-0 left-0 bg-[#0009]'></div>}
+			{isDragged && (
+				<div
+					className='w-screen h-screen absolute top-0 left-0 bg-[#0009]'
+					onClick={() => setIsDragged(false)}
+				></div>
+			)}
 		</>
 	);
 };

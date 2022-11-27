@@ -203,7 +203,7 @@ export const deleteMessage = async (chatId, messageId) => {
 	const messageRef = doc(db, `/chats/${chatId}/messages/${messageId}`);
 	const result = await getDoc(messageRef);
 	if (!result.exists()) return;
-	await updateDoc(messageRef, { content: 'Message removed', fileURL: [] });
+	await updateDoc(messageRef, { content: 'Message removed', fileURL: [], removedAt: Date.now() });
 };
 
 export const removedFile = async (chatId, uuid) => {

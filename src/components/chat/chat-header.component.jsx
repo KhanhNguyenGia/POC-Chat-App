@@ -17,6 +17,7 @@ import Avatar from '../avatar/avatar.component';
 import Button from '../button/button.component';
 import CollapseList from '../collapse-list/collapse-list.component';
 import { Label } from '../profile-page/basic-info-tab.component';
+import Spinner from '../spinner/spinner.component';
 import Switch from '../switch/switch.component';
 
 const MORE_LIST = [
@@ -64,6 +65,7 @@ const MORE_LIST = [
 			const { theme, dispatch } = useContext(ChatContext);
 			const [color, setColor] = useState(theme);
 			const { chatId } = useParams();
+			const [loading, setLoading] = useState(false);
 
 			useEffect(() => {
 				setColor(theme);
@@ -80,17 +82,20 @@ const MORE_LIST = [
 			const onSubmit = async (e) => {
 				try {
 					e.preventDefault();
+					setLoading(true);
 					if (!color || theme === color) return;
 					const expendedColor = expandColorCode(color);
 					if (!expendedColor.match(/^([a-f0-9]{6}|[a-f0-9]{8})$/gim)) {
 						toast.error('Invalid color code');
 						return;
 					}
-					dispatch({ type: CHAT_ACTION_TYPES.UPDATE_COLOR, payload: color });
 					await updateChatColor(chatId, color);
 					toast.success('Color has been updated');
+					dispatch({ type: CHAT_ACTION_TYPES.UPDATE_COLOR, payload: color });
 				} catch (error) {
 					toast.error('Failed to change color');
+				} finally {
+					setLoading(false);
 				}
 			};
 
@@ -118,8 +123,13 @@ const MORE_LIST = [
 						</div>
 					</div>
 					{color !== theme && (
-						<Button className='w-max' type='submit' style={{ background: '#' + color }}>
-							Save
+						<Button
+							className='w-max disabled:opacity-80'
+							type='submit'
+							style={{ background: '#' + color }}
+							disabled={loading}
+						>
+							{loading ? <Spinner size='w-7 h-7' /> : 'Apply'}
 						</Button>
 					)}
 				</form>
@@ -144,7 +154,9 @@ const MoreList = ({ showExtra }) => {
 		<CollapseList
 			list={MORE_LIST}
 			className={`absolute top-[calc(100%)] bg-layer3 shadow-xl text-text py-5 flex flex-col gap-5 transition-all rounded-lg max-w-xs z-20 ${
-				showExtra ? '-right-0 visible opacity-100' : '-right-20 opacity-0 invisible'
+				showExtra
+					? '-right-0 visible opacity-100'
+					: '-right-20 opacity-0 invisible pointer-events-none'
 			}`}
 		/>
 	);

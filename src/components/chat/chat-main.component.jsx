@@ -71,12 +71,13 @@ const ChatMain = ({ chat }) => {
 
 	return (
 		<>
-			<div className='chat__main bg-layer2 w-full rounded-lg flex flex-col-reverse mt-auto p-3 gap-2 overflow-auto h-full max-h-full shadow-xl'>
+			<div className='chat__main bg-layer2 w-full rounded-lg flex flex-col-reverse mt-auto p-3 gap-2 overflow-auto h-full max-h-full shadow-xl transition-all'>
 				{!!messages.length ? (
-					messages?.map(({ id, uid, content, fileURL }, index) => (
+					messages?.map(({ id, uid, content, fileURL, removedAt, sent }, index) => (
 						<ChatBubble
 							key={id}
 							id={id}
+							sentAt={sent}
 							current={uid === user.uid}
 							belongsTo={members.find((member) => member.uid === uid)}
 							same={
@@ -84,6 +85,7 @@ const ChatMain = ({ chat }) => {
 									messages[index].uid !== messages[index + 1].uid) ||
 								index === messages.length - 1
 							}
+							removedAt={removedAt}
 						>
 							{!!fileURL?.length && (
 								<div className='flex cursor-pointer'>
@@ -103,6 +105,7 @@ const ChatMain = ({ chat }) => {
 											);
 										return (
 											<div
+												uuid={file.uuid}
 												key={file.ref}
 												className='h-[40px] rounded-lg px-3 py-2 grid place-items-center'
 												onClick={() =>

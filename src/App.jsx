@@ -76,8 +76,8 @@ function App() {
 
 	return (
 		<>
-			<div className='App flex flex-col'>
-				<Suspense loading={<Spinner />}>
+			<Suspense loading={<Spinner />}>
+				<div className='App flex flex-col'>
 					<Routes>
 						<Route path='/' element={<NavBar />}>
 							<Route index element={<HomePage />} />
@@ -113,20 +113,20 @@ function App() {
 							<Route path='*' element={<ErrorPage code={404} />} />
 						</Route>
 					</Routes>
-				</Suspense>
-				<ToastContainer
-					position='top-right'
-					autoClose={4000}
-					hideProgressBar={false}
-					newestOnTop={false}
-					closeOnClick
-					rtl={false}
-					pauseOnFocusLoss={false}
-					draggable
-					pauseOnHover
-					theme='dark'
-				/>
-			</div>
+					<ToastContainer
+						position='top-right'
+						autoClose={4000}
+						hideProgressBar={false}
+						newestOnTop={false}
+						closeOnClick
+						rtl={false}
+						pauseOnFocusLoss={false}
+						draggable
+						pauseOnHover
+						theme='dark'
+					/>
+				</div>
+			</Suspense>
 		</>
 	);
 }
