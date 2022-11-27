@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { DeleteIcon, DocumentIcon, MoreIcon, ReplyIcon } from '../../assets/icon';
 import { ChatContext } from '../../context/chat.context';
 import { deleteMessage, removedFile } from '../../utils/firebase/firebase.utils';
+import Avatar from '../avatar/avatar.component';
 import Button from '../button/button.component';
 import Overlay from '../overlay/overlay.component';
 import Spinner from '../spinner/spinner.component';
@@ -209,17 +210,7 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 				<div className='flex flex-row gap-3'>
 					{!current && same && (
 						<div className='self-end'>
-							{belongsTo?.photoURL ? (
-								<img
-									src={belongsTo?.photoURL}
-									className='min-w-[40px] max-w-[40px] min-h-[40px] max-h-[40px] object-cover object-center rounded-full'
-									alt={belongsTo?.email}
-								/>
-							) : (
-								<div className='min-w-[40px] max-w-[40px] min-h-[40px] max-h-[40px] object-cover object-center rounded-full bg-slate-500 text-text font-medium text-2xl flex justify-center items-center'>
-									{belongsTo?.email.charAt(0).toUpperCase()}
-								</div>
-							)}
+							<Avatar members={[belongsTo]} avaSize={40} className='rounded-full overflow-hidden' />
 						</div>
 					)}
 					<div

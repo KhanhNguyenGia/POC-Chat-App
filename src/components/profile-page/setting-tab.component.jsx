@@ -5,7 +5,10 @@ import Switch from '../switch/switch.component';
 import { Label } from './basic-info-tab.component';
 
 const Tip = ({ children, ...rest }) => (
-	<div className='py-3 px-5 text-gray-500 border-2 border-gray-500 border-opacity-20 rounded-lg'>
+	<div
+		className='py-3 px-5 text-gray-500 border-2 border-gray-500 border-opacity-20 rounded-lg'
+		{...rest}
+	>
 		{children}
 	</div>
 );

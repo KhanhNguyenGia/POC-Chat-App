@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { uuidv4 } from '@firebase/util';
 import { AuthContext } from '../../context/auth.context';
 import { sendMessage, uploadFiles } from '../../utils/firebase/firebase.utils';
@@ -21,6 +21,36 @@ const FilePreviewRemoveIcon = ({ onRemove, index }) => (
 	</div>
 );
 
+const FilePreviewContainer = ({ file, index, onRemove }) => {
+	if (file.type.startsWith('image/')) {
+		return (
+			<div className='relative hover:opacity-80'>
+				<FilePreviewRemoveIcon onRemove={onRemove} index={index} />
+				<a href={file.url} className='text-text' onClick={(e) => e.stopPropagation()} download>
+					<img
+						className='block object-cover object-center rounded-lg w-[60px] h-[60px] shadow-xl'
+						src={file.url}
+						alt={file.name}
+					/>
+				</a>
+			</div>
+		);
+	}
+	return (
+		<div
+			className='h-[60px] rounded-lg px-3 py-2 grid place-items-center shadow-xl relative hover:opacity-80'
+			style={{
+				background: '#' + theme,
+			}}
+		>
+			<FilePreviewRemoveIcon onRemove={onRemove} index={index} />
+			<a href={file.url} className='text-text' onClick={(e) => e.stopPropagation()} download>
+				{file.name}
+			</a>
+		</div>
+	);
+};
+
 const ChatInput = () => {
 	const { user } = useContext(AuthContext);
 	const { theme } = useContext(ChatContext);
@@ -29,7 +59,6 @@ const ChatInput = () => {
 	const [message, setMessage] = useState('');
 	const [sending, setSending] = useState(false);
 	const [isDragged, setIsDragged] = useState(false);
-	const inputRef = useRef();
 
 	const onChange = (e) => {
 		setMessage(e.target.value);
@@ -101,7 +130,6 @@ const ChatInput = () => {
 			[...e.dataTransfer.items].forEach((item, i) => {
 				if (item.kind === 'file') {
 					const file = item.getAsFile();
-					console.log(file);
 					renderPreview(file);
 				}
 			});
@@ -113,11 +141,6 @@ const ChatInput = () => {
 			renderPreview(file);
 		}
 	};
-
-	useEffect(() => {
-		if (sending) return;
-		inputRef.current.focus();
-	}, [sending]);
 
 	useEffect(() => {
 		document.addEventListener('dragover', onDragOver);
@@ -137,47 +160,9 @@ const ChatInput = () => {
 			>
 				{!!files.length && (
 					<div className='flex w-full gap-3'>
-						{files.map((file, index) => {
-							if (file.type.startsWith('image/')) {
-								return (
-									<div key={index} className='relative hover:opacity-80'>
-										<FilePreviewRemoveIcon onRemove={onRemove} index={index} />
-										<a
-											href={file.url}
-											className='text-text'
-											onClick={(e) => e.stopPropagation()}
-											download
-										>
-											<img
-												key={index}
-												className='block object-cover object-center rounded-lg w-[60px] h-[60px] shadow-xl'
-												src={file.url}
-												alt={file.name}
-											/>
-										</a>
-									</div>
-								);
-							}
-							return (
-								<div
-									key={index}
-									className='h-[60px] rounded-lg px-3 py-2 grid place-items-center shadow-xl relative hover:opacity-80'
-									style={{
-										background: '#' + theme,
-									}}
-								>
-									<FilePreviewRemoveIcon onRemove={onRemove} index={index} />
-									<a
-										href={file.url}
-										className='text-text'
-										onClick={(e) => e.stopPropagation()}
-										download
-									>
-										{file.name}
-									</a>
-								</div>
-							);
-						})}
+						{files.map((file, index) => (
+							<FilePreviewContainer file={file} index={index} onRemove={onRemove} key={index} />
+						))}
 					</div>
 				)}
 				<div className='w-full flex justify-center items-center gap-3'>
@@ -204,7 +189,6 @@ const ChatInput = () => {
 						onChange={onChange}
 						value={message}
 						className='w-full rounded-lg px-5 py-1 h-10 shadow-xl bg-gray-200 disabled:bg-slate-600'
-						ref={inputRef}
 						readOnly={sending}
 						onPaste={(e) => onManualUpload(e.clipboardData.files)}
 					/>

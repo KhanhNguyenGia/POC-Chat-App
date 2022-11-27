@@ -27,7 +27,7 @@ const Avatar = ({ avaSize = 50, members, ...rest }) => {
 						) : (
 							<div
 								key={member?.email}
-								className={`text-text font-medium text-4xl flex justify-center items-center bg-slate-500`}
+								className={`text-text font-medium text-3xl flex justify-center items-center bg-slate-500`}
 								style={{
 									width: avaSize / 1,
 									height: avaSize / 1,

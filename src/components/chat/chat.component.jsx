@@ -7,7 +7,6 @@ import { ChatList, NewChatOverlay } from '.';
 import _ from 'lodash';
 
 const Chat = () => {
-	// const { chat } = useContext(ChatContext);
 	const { chatId: chat } = useParams();
 	const { user } = useContext(AuthContext);
 	const [chats, setChats] = useState([]);
@@ -46,7 +45,7 @@ const Chat = () => {
 				<div className='flex gap-5 h-full max-h-full'>
 					<ChatList setOpenNewChat={setOpenNewChat} chats={chats} />
 					<div
-						className={`absolute ${
+						className={`fixed top-0 z-20 sm:z-10 ${
 							chat ? '-right-0 flex' : '-right-full'
 						} bg-bg xs:bg-layer flex-[4] xs:static xs:right-0 max-h-full h-full xs:flex flex-col m-auto rounded-lg gap-3 p-3 overflow-hidden w-full duration-[230ms] transition-all`}
 					>

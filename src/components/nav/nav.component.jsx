@@ -33,8 +33,8 @@ const ProfileMenu = ({ open, setOpen }) => {
 
 	return (
 		<ul
-			className={`absolute top-full -right-2 bg-layer3 rounded-lg z-10 text-text py-3 w-[200px] flex flex-col ${
-				open ? 'visible opacity-100 top-[calc(100%_+_10px)]' : 'invisible opacity-0'
+			className={`absolute -right-2 bg-layer3 rounded-lg z-10 text-text py-3 w-[200px] flex flex-col ${
+				open ? 'visible opacity-100 top-[calc(100%_+_10px)]' : 'invisible opacity-0 top-full'
 			} transition-all font-normal text-xl shadow-xl`}
 		>
 			<ProfileMenuItem
@@ -80,7 +80,7 @@ const NavBar = () => {
 
 	return (
 		<>
-			<nav className='w-full sticky z-10'>
+			<nav className='w-full sticky z-10 sm:z-20'>
 				<div className='m-auto max-w-7xl p-5 flex justify-between items-center'>
 					<Link to='/' className='block'>
 						<img src='/MyChat.svg' className='h-8' />
