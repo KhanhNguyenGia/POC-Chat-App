@@ -170,10 +170,10 @@ const RegisterForm = () => {
 							{loading ? <Spinner /> : 'Register'}
 						</Button>
 					</div>
-					<div className='relative my-2 before:absolute before:block before:w-full before:h-[2px] before:bg-white before:rounded-full'>
-						<div className='absolute bg-layer px-3 py-2 text-text font-semibold w-max -translate-x-1/2 -translate-y-1/2 left-1/2'>
-							Or sign in with
-						</div>
+					<div className='my-1 flex items-center'>
+						<div className='h-[2px] bg-white flex-1'></div>
+						<div className='px-4 py-2 text-text font-semibold w-max'>Or sign in with</div>
+						<div className='h-[2px] bg-white flex-1'></div>
 					</div>
 					<div className='flex flex-row gap-5 justify-center items-center'>
 						<Button
