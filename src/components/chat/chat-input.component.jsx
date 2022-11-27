@@ -99,8 +99,8 @@ const ChatInput = () => {
 		}
 	};
 
-	const onManualUpload = (e) => {
-		for (let file of e.target.files) {
+	const onManualUpload = (fileList) => {
+		for (let file of fileList) {
 			renderPreview(file);
 		}
 	};
@@ -171,7 +171,7 @@ const ChatInput = () => {
 							className='absolute h-0 w-0 opacity-0'
 							multiple
 							values={files}
-							onChange={onManualUpload}
+							onChange={(e) => onManualUpload(e.target.files)}
 						/>
 					</label>
 					<input
@@ -180,6 +180,7 @@ const ChatInput = () => {
 						className='w-full rounded-lg px-5 py-1 h-10 shadow-xl bg-gray-200 disabled:bg-slate-600'
 						ref={inputRef}
 						readOnly={sending}
+						onPaste={(e) => onManualUpload(e.clipboardData.files)}
 					/>
 					<Button disabled={sending} onClick={onSendMessage} style={{ background: '#' + theme }}>
 						{sending ? <Spinner size='w-6 h-6' /> : <SendIcon className='stroke-white stroke-2' />}
