@@ -170,6 +170,7 @@ const BubbleMenu = ({ setOpen, current, open, onDelete, onCopy, removed }) => (
 const TOUCH_DURATION = 500;
 
 const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt }) => {
+	// const { theme } = useContext(ChatContext);
 	const [open, setOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const [dateOpen, setDateOpen] = useState(false);
@@ -246,7 +247,6 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 						}`}
 						style={{
 							wordWrap: 'break-word',
-							// background: dateOpen ? '#' + theme : current ? '#' + theme : '#333',
 						}}
 						onTouchStart={touchStart}
 						onTouchEnd={touchEnd}

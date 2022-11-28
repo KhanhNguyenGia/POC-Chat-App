@@ -83,10 +83,7 @@ const MORE_LIST = [
 						Delete
 					</div>
 					{open && (
-						<Overlay
-							className='w-screen h-screen fixed top-0 left-0 bg-[#0009] z-50 overflow-hidden'
-							onClick={() => setOpen(false)}
-						>
+						<Overlay onClick={() => setOpen(false)}>
 							<div
 								className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-layer p-5 flex flex-col gap-5 rounded-lg'
 								onClick={(e) => e.stopPropagation()}

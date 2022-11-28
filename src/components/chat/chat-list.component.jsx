@@ -1,21 +1,20 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ReactTimeAgo from 'react-time-ago';
 import { AuthContext } from '../../context/auth.context';
-// import { ChatContext, CHAT_ACTION_TYPES } from '../../context/chat.context';
 import Button from '../button/button.component';
 import Avatar from '../avatar/avatar.component';
 import { useNavigate, useParams } from 'react-router';
 import { AddIcon } from '../../assets/icon';
+import NewChatOverlay from './new-chat-overlay.component';
+import useChatList from '../../hooks/useChatList.hook.jsx';
 
 const ChatListItem = ({ id, members, selected, newUpdate, updated }) => {
 	const navigate = useNavigate();
-	// const { dispatch } = useContext(ChatContext);
 	const names = members.map((member) => member.email.split('@')[0].slice(0, 8)).join(', ');
 	const date = new Date(updated);
 	return (
 		<div
 			onClick={() => {
-				// dispatch({ type: CHAT_ACTION_TYPES.SET_CHAT, payload: id });
 				navigate(`/chat/${id}`);
 			}}
 			className={`flex flex-row gap-4 cursor-pointer rounded-lg p-2 items-center transition-all duration-300 ${
@@ -45,40 +44,50 @@ const ChatListItemLoading = () => (
 	</div>
 );
 
-const ChatList = ({ setOpenNewChat, chats }) => {
+const ChatList = () => {
+	const { chatId } = useParams();
 	const { user } = useContext(AuthContext);
-	// const { chat } = useContext(ChatContext);
-	const { chatId: chat } = useParams();
+	const [openNewChat, setOpenNewChat] = useState(false);
+	const { chats, loading } = useChatList();
+
+	useEffect(() => {
+		const input = document.getElementById('search-user');
+		input?.focus();
+	}, [openNewChat]);
+
 	return (
-		<div className='md:flex-1 flex-col bg-bg xs:bg-layer xs:rounded-lg p-3 gap-5 flex overflow-hidden max-h-full xs:flex-none flex-1'>
-			<div className='sticky'>
-				{/* <input
+		<>
+			<div className='md:flex-1 flex-col bg-bg xs:bg-layer xs:rounded-lg p-3 gap-5 flex overflow-hidden max-h-full xs:flex-none flex-1'>
+				<div className='sticky'>
+					{/* <input
 					className='xs:hidden md:block px-3 py-2 rounded-lg w-full h-[50px]'
 					placeholder='Search user...'
 					onFocus={() => setOpenNewChat(true)}
 				/> */}
-				<Button
-					className='flex-none w-full text-3xl font-bold h-[50px] rounded-lg'
-					onClick={() => setOpenNewChat(true)}
-				>
-					<AddIcon className='stroke-2 m-auto' />
-				</Button>
+					<Button
+						className='flex-none w-full text-3xl font-bold h-[50px] rounded-lg'
+						onClick={() => setOpenNewChat(true)}
+					>
+						<AddIcon className='stroke-2 m-auto' />
+					</Button>
+				</div>
+				<div className='flex flex-1 flex-col w-full gap-5 max-h-[600px] overflow-auto'>
+					{loading
+						? [...Array(5)].map((_, index) => <ChatListItemLoading key={index} />)
+						: chats?.map(({ id, members, updated }) => (
+								<ChatListItem
+									id={id}
+									members={members.filter((member) => member.uid != user.uid)}
+									key={id}
+									selected={chatId === id}
+									newUpdate={false}
+									updated={updated}
+								/>
+						  ))}
+				</div>
 			</div>
-			<div className='flex flex-1 flex-col w-full gap-5 max-h-[600px] overflow-auto'>
-				{!!chats?.length
-					? chats?.map(({ id, members, updated }) => (
-							<ChatListItem
-								id={id}
-								members={members.filter((member) => member.uid != user.uid)}
-								key={id}
-								selected={chat === id}
-								newUpdate={false}
-								updated={updated}
-							/>
-					  ))
-					: [...Array(5)].map((_, index) => <ChatListItemLoading key={index} />)}
-			</div>
-		</div>
+			{openNewChat && <NewChatOverlay setOpenNewChat={setOpenNewChat} />}
+		</>
 	);
 };
 

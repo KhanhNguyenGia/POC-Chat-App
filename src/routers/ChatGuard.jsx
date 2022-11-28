@@ -25,7 +25,7 @@ const ChatGuard = () => {
 	return (
 		<ChatProvider>
 			<ChatHeader />
-			<ChatMain chat={chatId} />
+			<ChatMain />
 			<ChatInput />
 		</ChatProvider>
 	);

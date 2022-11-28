@@ -1,7 +1,7 @@
 const Overlay = ({ children, zIndex, ...rest }) => {
 	return (
 		<div
-			className='absolute top-1/2 left-1/2 w-screen h-screen -translate-x-1/2 -translate-y-1/2 bg-[#0009] flex justify-center items-center z-10'
+			className='w-screen h-screen fixed top-0 left-0 bg-[#0009] z-50 overflow-hidden flex justify-center items-center'
 			{...rest}
 		>
 			{children}

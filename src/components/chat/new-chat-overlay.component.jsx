@@ -92,12 +92,14 @@ const NewChatOverlay = ({ setOpenNewChat }) => {
 					onChange={onNewSearch}
 					className='text-[#000] px-4 py-2 rounded-lg'
 					placeholder='abc@gmail.com'
+					autoComplete='off'
 				/>
-				<div className='flex flex-row gap-2 max-w-[90%] justify-center items-center'>
+				<div className='flex flex-row gap-2 max-w-[90%] justify-center items-center flex-wrap'>
 					{users.map((user) => (
 						<Button
 							onClick={() => setUsers((prev) => prev.filter((_) => _.uid != user.uid))}
 							key={user.uid}
+							className='bg-action'
 						>
 							{user.email.split('@')[0]}
 						</Button>
