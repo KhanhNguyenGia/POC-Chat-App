@@ -12,7 +12,7 @@ export default defineConfig({
 		}),
 		VitePWA({
 			registerType: 'autoUpdate',
-			includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+			includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'android-chrome-512x512.png'],
 			manifest: {
 				name: 'MyChat',
 				short_name: 'MC',
@@ -26,6 +26,12 @@ export default defineConfig({
 						src: '/android-chrome-512x512.png',
 						sizes: '512x512',
 						type: 'image/png',
+					},
+					{
+						src: '/android-chrome-512x512.png',
+						sizes: '512x512',
+						type: 'image/png',
+						purpose: 'any maskable',
 					},
 				],
 				theme_color: '#000',
