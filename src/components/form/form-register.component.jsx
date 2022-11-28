@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 import {
 	auth,
 	facebookProvider,
-	googlePopup,
 	googleProvider,
+	setUser,
 	signUp,
 } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
@@ -67,6 +67,9 @@ const RegisterForm = () => {
 		const getRedirect = async () => {
 			try {
 				const result = await getRedirectResult(auth);
+				if (!result) return;
+				const { user } = result;
+				await setUser(user);
 			} catch (error) {
 				const message = getError(error.code);
 				setError(message);

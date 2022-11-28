@@ -10,7 +10,7 @@ const Chat = () => {
 				<div className='flex gap-5 h-full max-h-full'>
 					<ChatList />
 					<div
-						className={`fixed top-0 z-20 sm:z-10 ${
+						className={`fixed top-0 z-20 xs:z-10 ${
 							chatId ? '-right-0 flex' : '-right-full'
 						} bg-bg xs:bg-layer flex-[4] xs:static xs:right-0 max-h-full h-full xs:flex flex-col m-auto rounded-lg gap-3 p-3 overflow-hidden w-full duration-[230ms] transition-all`}
 					>

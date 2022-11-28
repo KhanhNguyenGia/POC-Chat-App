@@ -1,10 +1,8 @@
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useContext, useEffect, useState } from 'react';
 import { DocumentIcon, DownArrowIcon, ZoomInIcon, ZoomOutIcon } from '../../assets/icon';
 import { AuthContext } from '../../context/auth.context';
 import { ChatContext } from '../../context/chat.context';
 import useChatMessage from '../../hooks/useChatMessage.hook';
-import { db, getChatMembers } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
 import Overlay from '../overlay/overlay.component';
 import ChatBubble from './chat-bubble.component';
@@ -189,7 +187,7 @@ const ChatMain = () => {
 			</div>
 			{showToBottom && (
 				<div
-					className='fixed bg-layer p-2 rounded-full right-1/2 -translate-x-1/2 xs:right-[38%] bottom-20 xs:bottom-24 animate-bounce cursor-pointer shadow-xl'
+					className='fixed bg-layer p-2 rounded-full right-1/2 translate-x-1/2 xs:right-[38%] bottom-20 xs:bottom-24 animate-bounce cursor-pointer shadow-xl'
 					onClick={scrollToBottom}
 				>
 					<DownArrowIcon

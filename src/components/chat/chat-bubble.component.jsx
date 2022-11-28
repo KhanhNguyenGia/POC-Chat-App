@@ -1,10 +1,8 @@
-import _ from 'lodash';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import ReactTimeAgo from 'react-time-ago';
 import { toast } from 'react-toastify';
 import { DeleteIcon, DocumentIcon, MoreIcon, ReplyIcon } from '../../assets/icon';
-import { ChatContext } from '../../context/chat.context';
 import { deleteMessage, removedFile } from '../../utils/firebase/firebase.utils';
 import Avatar from '../avatar/avatar.component';
 import Button from '../button/button.component';
@@ -196,14 +194,12 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 	};
 
 	const touchStart = (e) => {
-		if (removedAt) return;
 		if (!timer) {
 			timer = setTimeout(onLongTouch, TOUCH_DURATION);
 		}
 	};
 
 	const touchEnd = () => {
-		if (removedAt) return;
 		if (timer) {
 			clearTimeout(timer);
 			timer = null;

@@ -5,11 +5,9 @@ import { Link } from 'react-router-dom';
 import {
 	auth,
 	facebookProvider,
-	googlePopup,
 	googleProvider,
 	setUser,
 	signInWithEmail,
-	signUp,
 } from '../../utils/firebase/firebase.utils';
 import { getError } from '../../utils/util';
 import Button from '../button/button.component';
