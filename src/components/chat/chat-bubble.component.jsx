@@ -22,14 +22,14 @@ const ChatBubbleOption = ({ children, ...rest }) => {
 	);
 };
 
-const DeleteOverlay = ({ setDeleteOpen, messageId, filesIDs }) => {
+const DeleteOverlay = ({ setDeleteOpen, messageId, filesIDs, removed }) => {
 	const { chatId } = useParams();
 	const [loading, setLoading] = useState(false);
 
 	const onDelete = async () => {
 		try {
 			setLoading(true);
-			await deleteMessage(chatId, messageId);
+			await deleteMessage(chatId, messageId, removed);
 			if (filesIDs) {
 				await Promise.all(filesIDs.map((file) => removedFile(chatId, file)));
 			}
@@ -51,8 +51,32 @@ const DeleteOverlay = ({ setDeleteOpen, messageId, filesIDs }) => {
 					Are you sure you want to remove the message?
 				</div>
 				<ul className='text-slate-300 border-2 border-slate-500 border-opacity-30 rounded-lg py-2 px-3 flex flex-col gap-3'>
-					<li>- Removing the message will remove it for all users in the chat.</li>
-					<li>- Removed message can not be recovered.</li>
+					{removed ? (
+						<>
+							<li>
+								- This will <span className='text-red-500 font-semibold'>PERMANENTLY</span> removed
+								the message from the chat.
+							</li>
+							<li>
+								- This action is <span className='text-red-500 font-semibold'>IRREVERSIBLE</span>.
+							</li>
+						</>
+					) : (
+						<>
+							<li>
+								- Removing the message will remove it for{' '}
+								<span className='text-red-500 font-semibold'>ALL</span> users in the chat.
+							</li>
+							<li>
+								- Removed message <span className='text-red-500 font-semibold'>CAN NOT</span> be
+								recovered.
+							</li>
+							<li>
+								- <span className='text-red-500 font-semibold'>ALL</span> files will also be
+								removed.
+							</li>
+						</>
+					)}
 				</ul>
 				<div className='flex gap-5'>
 					<Button
@@ -101,12 +125,12 @@ const DateOpen = ({ removedAt, sentAt, current }) => {
 	);
 };
 
-const BubbleMenu = ({ setOpen, current, open, onDelete, onCopy }) => (
+const BubbleMenu = ({ setOpen, current, open, onDelete, onCopy, removed }) => (
 	<div
 		onClick={(e) => e.stopPropagation()}
 		onMouseEnter={() => setOpen(true)}
 		onMouseLeave={() => setOpen(false)}
-		className={`absolute top-1/2 -translate-y-1/2 transition-all duration-200 ${
+		className={`absolute top-1/2 -translate-y-1/2 transition-all duration-200 cursor-pointer ${
 			open ? 'opacity-100 z-50' : 'opacity-0'
 		} z-10 ${current ? 'right-[calc(100%_+_10px)]' : 'left-[calc(100%_+_10px)]'}`}
 		style={{ fontStyle: 'normal' }}
@@ -126,14 +150,18 @@ const BubbleMenu = ({ setOpen, current, open, onDelete, onCopy }) => (
 						Remove
 					</ChatBubbleOption>
 				)}
-				<ChatBubbleOption>
-					<ReplyIcon />
-					Reply
-				</ChatBubbleOption>
-				<ChatBubbleOption onClick={onCopy}>
-					<DocumentIcon />
-					Copy
-				</ChatBubbleOption>
+				{!removed && (
+					<>
+						<ChatBubbleOption>
+							<ReplyIcon />
+							Reply
+						</ChatBubbleOption>
+						<ChatBubbleOption onClick={onCopy}>
+							<DocumentIcon />
+							Copy
+						</ChatBubbleOption>
+					</>
+				)}
 			</div>
 		)}
 	</div>
@@ -142,7 +170,6 @@ const BubbleMenu = ({ setOpen, current, open, onDelete, onCopy }) => (
 const TOUCH_DURATION = 500;
 
 const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt }) => {
-	const { theme } = useContext(ChatContext);
 	const [open, setOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const [dateOpen, setDateOpen] = useState(false);
@@ -219,7 +246,7 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 						}`}
 						style={{
 							wordWrap: 'break-word',
-							background: dateOpen ? '#' + theme : current ? '#' + theme : '#333',
+							// background: dateOpen ? '#' + theme : current ? '#' + theme : '#333',
 						}}
 						onTouchStart={touchStart}
 						onTouchEnd={touchEnd}
@@ -230,13 +257,14 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 					>
 						{dateOpen && <DateOpen removedAt={removedAt} sentAt={sentAt} current={current} />}
 						{children}
-						{!removedAt && (
+						{(!removedAt || current) && (
 							<BubbleMenu
 								setOpen={setOpen}
 								current={current}
 								open={open}
 								onDelete={onDelete}
 								onCopy={onCopy}
+								removed={removedAt}
 							/>
 						)}
 					</div>
@@ -247,6 +275,7 @@ const ChatBubble = ({ current, children, belongsTo, same, id, removedAt, sentAt 
 					setDeleteOpen={setDeleteOpen}
 					messageId={id}
 					filesIDs={children[0].props?.children.map((child) => child.props.uuid)}
+					removed={removedAt}
 				/>
 			)}
 		</>

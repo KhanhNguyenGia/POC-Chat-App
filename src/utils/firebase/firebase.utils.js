@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import {
 	addDoc,
 	collection,
+	deleteDoc,
 	doc,
 	getDoc,
 	getDocs,
@@ -199,15 +200,32 @@ export const updateChatColor = async (chatId, value) => {
 	await updateDoc(docRef, { theme: value });
 };
 
-export const deleteMessage = async (chatId, messageId) => {
+export const deleteMessage = async (chatId, messageId, removed) => {
 	const messageRef = doc(db, `/chats/${chatId}/messages/${messageId}`);
 	const result = await getDoc(messageRef);
 	if (!result.exists()) return;
-	await updateDoc(messageRef, { content: 'Message removed', fileURL: [], removedAt: Date.now() });
+	!removed
+		? await updateDoc(messageRef, {
+				content: 'Message removed',
+				fileURL: [],
+				removedAt: Date.now(),
+		  })
+		: await deleteDoc(messageRef);
 };
 
 export const removedFile = async (chatId, uuid) => {
 	if (!chatId || !uuid) return;
 	const fileRef = ref(storage, `/chats/${chatId}/${uuid}`);
 	return deleteObject(fileRef);
+};
+
+export const deleteAllMessage = async (chatId) => {
+	const messageRef = collection(db, `/chats/${chatId}/messages`);
+	const result = await getDocs(messageRef);
+	if (result.empty) return;
+	await Promise.all(
+		result.docs.map((doc) => {
+			return deleteDoc(doc.ref);
+		})
+	);
 };

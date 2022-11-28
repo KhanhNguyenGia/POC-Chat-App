@@ -21,7 +21,7 @@ const FilePreviewRemoveIcon = ({ onRemove, index }) => (
 	</div>
 );
 
-const FilePreviewContainer = ({ file, index, onRemove }) => {
+const FilePreviewContainer = ({ file, index, onRemove, theme }) => {
 	if (file.type.startsWith('image/')) {
 		return (
 			<div className='relative hover:opacity-80'>
@@ -161,7 +161,13 @@ const ChatInput = () => {
 				{!!files.length && (
 					<div className='flex w-full gap-3'>
 						{files.map((file, index) => (
-							<FilePreviewContainer file={file} index={index} onRemove={onRemove} key={index} />
+							<FilePreviewContainer
+								file={file}
+								index={index}
+								onRemove={onRemove}
+								key={index}
+								theme={theme}
+							/>
 						))}
 					</div>
 				)}

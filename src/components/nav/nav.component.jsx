@@ -80,7 +80,7 @@ const NavBar = () => {
 
 	return (
 		<>
-			<nav className='w-full sticky z-10 sm:z-20'>
+			<nav className={`w-full sticky z-10 ${open && 'sm:z-20'}`}>
 				<div className='m-auto max-w-7xl p-5 flex justify-between items-center'>
 					<Link to='/' className='block'>
 						<img src='/MyChat.svg' className='h-8' />

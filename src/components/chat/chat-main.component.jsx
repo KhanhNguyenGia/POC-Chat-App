@@ -1,4 +1,4 @@
-import { collection, limit, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useContext, useEffect, useState } from 'react';
 import { DocumentIcon, ZoomInIcon, ZoomOutIcon } from '../../assets/icon';
 import { AuthContext } from '../../context/auth.context';
@@ -8,7 +8,7 @@ import Button from '../button/button.component';
 import Overlay from '../overlay/overlay.component';
 import ChatBubble from './chat-bubble.component';
 
-const FileContainer = ({ file, setPreview, theme }) => {
+const FileContainer = ({ file, setPreview, theme, current }) => {
 	if (file.type.startsWith('image/'))
 		return (
 			<img
@@ -16,7 +16,7 @@ const FileContainer = ({ file, setPreview, theme }) => {
 				key={file.ref}
 				src={file.ref}
 				alt='user image'
-				className='object-cover object-center w-1/2 max-h-[200px] flex-auto rounded-lg hover:opacity-80'
+				className='object-cover object-center max-h-[200px] hover:opacity-80 rounded-lg flex-1 bg-layer3'
 				style={{ borderColor: '#' + theme }}
 				onClick={() => setPreview({ ref: file.ref, type: file.type, name: file.name })}
 			/>
@@ -25,8 +25,11 @@ const FileContainer = ({ file, setPreview, theme }) => {
 		<div
 			uuid={file.uuid}
 			key={file.ref}
-			className='rounded-lg px-4 py-3 flex gap-3'
+			className='rounded-lg px-4 py-3 flex gap-3 items-center justify-center flex-1'
 			onClick={() => setPreview({ ref: file.ref, type: file.type, name: file.name })}
+			style={{
+				background: current ? '#' + theme : '#333',
+			}}
 		>
 			<DocumentIcon />
 			<span href={file.ref} className='text-text cursor-pointer'>
@@ -108,7 +111,7 @@ const ChatMain = ({ chat }) => {
 
 	useEffect(() => {
 		const unsubscribeFromChat = onSnapshot(
-			query(collection(db, `/chats/${chat}/messages`), limit(50), orderBy('sent', 'desc')),
+			query(collection(db, `/chats/${chat}/messages`), orderBy('sent', 'desc')),
 			(snapshot) => {
 				setMessages(
 					snapshot.docs.map((doc) => {
@@ -158,18 +161,28 @@ const ChatMain = ({ chat }) => {
 							removedAt={removedAt}
 						>
 							{!!fileURL?.length && (
-								<div className='flex cursor-pointer flex-wrap justify-end'>
+								<div className='flex cursor-pointer justify-end flex-wrap mb-1 gap-1'>
 									{fileURL.map((file) => (
 										<FileContainer
 											key={file.uuid}
 											file={file}
 											setPreview={setPreview}
 											theme={theme}
+											current={uid === user.uid}
 										/>
 									))}
 								</div>
 							)}
-							{content && <div className='px-3 py-2'>{content}</div>}
+							{content && (
+								<div
+									className='px-3 py-2 rounded-lg'
+									style={{
+										background: uid === user.uid ? '#' + theme : '#333',
+									}}
+								>
+									{content}
+								</div>
+							)}
 						</ChatBubble>
 					))
 				) : (
