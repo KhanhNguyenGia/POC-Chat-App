@@ -225,7 +225,16 @@ export const deleteAllMessage = async (chatId) => {
 	if (result.empty) return;
 	await Promise.all(
 		result.docs.map((doc) => {
+			const fileURL = doc.data().fileURL;
+			fileURL.map((file) => removedFile(chatId, file.uuid));
 			return deleteDoc(doc.ref);
 		})
 	);
+};
+
+export const deleteChat = async (chatId) => {
+	const chatRef = doc(db, `/chats/${chatId}`);
+	const result = await getDoc(chatRef);
+	if (!result.exists()) return;
+	await deleteDoc(chatRef);
 };

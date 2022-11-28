@@ -12,13 +12,19 @@ import {
 } from '../../assets/icon';
 import { AuthContext } from '../../context/auth.context';
 import { ChatContext, CHAT_ACTION_TYPES } from '../../context/chat.context';
-import { getChatInfo, getChatMembers, updateChatColor } from '../../utils/firebase/firebase.utils';
+import {
+	deleteAllMessage,
+	deleteChat,
+	getChatInfo,
+	getChatMembers,
+	updateChatColor,
+} from '../../utils/firebase/firebase.utils';
 import Avatar from '../avatar/avatar.component';
 import Button from '../button/button.component';
 import CollapseList from '../collapse-list/collapse-list.component';
-import { Label } from '../profile-page/basic-info-tab.component';
 import Spinner from '../spinner/spinner.component';
 import Switch from '../switch/switch.component';
+import Overlay from '../overlay/overlay.component';
 
 const MORE_LIST = [
 	{
@@ -46,12 +52,78 @@ const MORE_LIST = [
 				<span className=' xs:inline'>Setting</span>
 			</>
 		),
-		content: () => (
-			<div className='hover:bg-red-500 flex flex-row gap-5 justify-center w-full py-4 cursor-pointer'>
-				<DeleteIcon />
-				Delete
-			</div>
-		),
+		content: () => {
+			const [open, setOpen] = useState(false);
+			const [loading, setLoading] = useState(false);
+			const { chatId } = useParams();
+			const navigate = useNavigate();
+
+			const onChatDelete = async () => {
+				setLoading(true);
+				try {
+					await deleteAllMessage(chatId);
+					await deleteChat(chatId);
+					toast.success('Chat deleted successfully');
+					navigate('/chat');
+				} catch (error) {
+					toast.error(error.message);
+				}
+				setLoading(false);
+			};
+
+			return (
+				<>
+					<div
+						className='hover:bg-red-500 flex flex-row gap-5 justify-center w-full py-4 cursor-pointer'
+						onClick={() => {
+							setOpen(true);
+						}}
+					>
+						<DeleteIcon />
+						Delete
+					</div>
+					{open && (
+						<Overlay
+							className='w-screen h-screen fixed top-0 left-0 bg-[#0009] z-50 overflow-hidden'
+							onClick={() => setOpen(false)}
+						>
+							<div
+								className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-layer p-5 flex flex-col gap-5 rounded-lg'
+								onClick={(e) => e.stopPropagation()}
+							>
+								<ul className='flex flex-col gap-3'>
+									<li className='text-center text-xl font-bold text-red-500'>
+										Are you sure you want to delete this chat?
+									</li>
+									<li className='text-center border-2 border-slate-500 border-opacity-30 rounded-lg w-full px-3 py-4'>
+										This action <span className='text-red-500 font-semibold'>CAN NOT</span> be
+										undone.
+									</li>
+								</ul>
+								<div className='flex gap-3'>
+									<Button
+										color='primary'
+										type='button'
+										className='bg-red-500 hover:bg-red-600 active:opacity-80'
+										onClick={onChatDelete}
+									>
+										{loading ? <Spinner size='w-7 h-7' /> : 'Delete'}
+									</Button>
+									<Button
+										color='secondary'
+										type='button'
+										className='border-red-500 hover:border-red-600 active:opacity-80'
+										onClick={() => setOpen(false)}
+									>
+										Cancel
+									</Button>
+								</div>
+							</div>
+						</Overlay>
+					)}
+				</>
+			);
+		},
 		chevron: true,
 	},
 	{
