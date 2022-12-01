@@ -78,7 +78,7 @@ const DownloadOverlay = ({ setPreview, theme, preview }) => {
 		<Overlay onClick={() => setPreview(null)}>
 			<div className='w-full h-full'>
 				<div className='w-full h-[60px] fixed bg-[#000a]' onClick={(e) => e.stopPropagation()}>
-					<div className='w-full h-full max-w-7xl flex justify-between items-center p-5'>
+					<div className='w-full h-full max-w-7xl flex justify-between items-center p-5 m-auto'>
 						<div className='flex flex-row gap-5'>
 							<Button color='icon' onClick={onZoomOut}>
 								<ZoomOutIcon />
@@ -95,7 +95,7 @@ const DownloadOverlay = ({ setPreview, theme, preview }) => {
 					</div>
 				</div>
 				<div className='w-max flex justify-center items-center flex-col m-auto text-text h-full'>
-					<div className='w-full h-ull grid place-items-center'>
+					<div className='w-full h-full grid place-items-center'>
 						{preview.type.startsWith('image/') ? (
 							<div
 								className='flex flex-col items-center justify-center gap-10'
