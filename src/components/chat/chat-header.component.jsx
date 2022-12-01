@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import {
@@ -15,9 +15,11 @@ import { ChatContext, CHAT_ACTION_TYPES } from '../../context/chat.context';
 import {
 	deleteAllMessage,
 	deleteChat,
+	getAllFiles,
 	getChatInfo,
 	getChatMembers,
 	updateChatColor,
+	updateNotificationToken,
 } from '../../utils/firebase/firebase.utils';
 import Avatar from '../avatar/avatar.component';
 import Button from '../button/button.component';
@@ -34,15 +36,33 @@ const MORE_LIST = [
 				<span className=' xs:inline'>Notification</span>
 			</>
 		),
-		content: () => (
-			<div className='px-3 py-2 m-auto w-max'>
-				<div className='flex flex-row gap-3 items-center'>
-					<label>Off</label>
-					<Switch />
-					<label>On</label>
+		content: () => {
+			const { chatId } = useParams();
+			const { user } = useContext(AuthContext);
+			const { notificationTokens } = useContext(ChatContext);
+			const [checked, setChecked] = useState(false);
+
+			const onChange = async (e) => {
+				await updateNotificationToken(chatId, user.uid, !checked);
+				setChecked(!checked);
+			};
+
+			useEffect(() => {
+				if (notificationTokens) {
+					setChecked(!!notificationTokens[user.uid].length);
+				}
+			}, [notificationTokens]);
+
+			return (
+				<div className='px-3 py-2 m-auto w-max'>
+					<div className='flex flex-row gap-3 items-center'>
+						<label>Off</label>
+						<Switch checked={checked} onChange={onChange} />
+						<label>On</label>
+					</div>
 				</div>
-			</div>
-		),
+			);
+		},
 		chevron: true,
 	},
 	{
@@ -85,7 +105,7 @@ const MORE_LIST = [
 					{open && (
 						<Overlay onClick={() => setOpen(false)}>
 							<div
-								className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-layer p-5 flex flex-col gap-5 rounded-lg'
+								className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-layer p-5 flex flex-col gap-5 rounded-lg max-w-[min(80%,360px)]'
 								onClick={(e) => e.stopPropagation()}
 							>
 								<ul className='flex flex-col gap-3'>
@@ -206,16 +226,31 @@ const MORE_LIST = [
 		},
 		chevron: true,
 	},
-	{
-		title: (
-			<>
-				<DocumentIcon />
-				<span className=' xs:inline'>Files</span>
-			</>
-		),
-		content: () => <div className='px-3 py-2'>Collection of files and images sent</div>,
-		chevron: true,
-	},
+	// {
+	// 	title: (
+	// 		<>
+	// 			<DocumentIcon />
+	// 			<span className=' xs:inline'>Files</span>
+	// 		</>
+	// 	),
+	// 	content: () => {
+	// 		const { chatId } = useParams();
+
+	// 		useEffect(() => {
+	// 			const getChatFiles = async () => {
+	// 				try {
+	// 					await getAllFiles(chatId);
+	// 				} catch (error) {
+	// 					toast.error("Failed to get chat's files");
+	// 				}
+	// 			};
+	// 			getChatFiles();
+	// 		}, [chatId]);
+
+	// 		return <div className='px-3 py-2'>Collection of files and images sent</div>;
+	// 	},
+	// 	chevron: true,
+	// },
 ];
 
 const MoreList = ({ showExtra }) => {
@@ -257,9 +292,8 @@ const ChatHeader = () => {
 		};
 		const getChat = async () => {
 			const chatInfo = await getChatInfo(chatId);
-			// console.log(chatInfo);
 			const theme = chatInfo.theme ?? '0092CA';
-			dispatch({ type: CHAT_ACTION_TYPES.UPDATE_COLOR, payload: theme });
+			dispatch({ type: CHAT_ACTION_TYPES.UPDATE_ALL, payload: { ...chatInfo, theme } });
 		};
 		getChat();
 		getMembers();

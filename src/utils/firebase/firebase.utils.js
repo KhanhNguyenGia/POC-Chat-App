@@ -22,10 +22,10 @@ import {
 	createUserWithEmailAndPassword,
 	FacebookAuthProvider,
 } from 'firebase/auth';
-import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
-import { getMessaging, getToken } from 'firebase/messaging';
+import { deleteObject, getBlob, getStorage, listAll, ref, uploadBytes } from 'firebase/storage';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
-const firebaseConfig = {
+export const firebaseConfig = {
 	apiKey: 'AIzaSyBWdfeN1kOntlt7JIGjVaCgzCPNdP0mM1M',
 	authDomain: 'poc-chat-app-6da8c.firebaseapp.com',
 	projectId: 'poc-chat-app-6da8c',
@@ -237,4 +237,39 @@ export const deleteChat = async (chatId) => {
 	const result = await getDoc(chatRef);
 	if (!result.exists()) return;
 	await deleteDoc(chatRef);
+};
+
+export const updateNotificationToken = async (chatId, uuid, state) => {
+	const chatRef = doc(db, `/chats/${chatId}`);
+	const result = await getDoc(chatRef);
+	const tokens = result.data().notificationTokens ?? {};
+	const userTokens = tokens[uuid] ?? [];
+	const currentToken = await getToken(messaging);
+	if (state) {
+		userTokens.push(currentToken);
+	} else {
+		const index = userTokens.indexOf(currentToken);
+		if (index > -1) {
+			userTokens.splice(index, 1);
+		}
+	}
+	tokens[uuid] = userTokens;
+	await updateDoc(chatRef, { notificationTokens: tokens });
+};
+
+export const getAllFiles = async (chatId) => {
+	const listRef = ref(storage, `/chats/${chatId}`);
+	const res = await listAll(listRef);
+	console.log(res.prefixes);
+	console.log(res.items);
+};
+
+export const downloadFile = async (chatId, uuid, url = false) => {
+	const fileRef = ref(storage, `/chats/${chatId}/${uuid}`);
+	if (url) {
+		const url = await getDownloadURL(fileRef);
+		return url;
+	}
+	const blob = await getBlob(fileRef);
+	return blob;
 };

@@ -1,8 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 import { DocumentIcon, DownArrowIcon, ZoomInIcon, ZoomOutIcon } from '../../assets/icon';
 import { AuthContext } from '../../context/auth.context';
 import { ChatContext } from '../../context/chat.context';
 import useChatMessage from '../../hooks/useChatMessage.hook';
+import { downloadFile } from '../../utils/firebase/firebase.utils';
 import Button from '../button/button.component';
 import Overlay from '../overlay/overlay.component';
 import ChatBubble from './chat-bubble.component';
@@ -17,7 +19,7 @@ const FileContainer = ({ file, setPreview, theme, current }) => {
 				alt='user image'
 				className='object-cover object-center max-h-[200px] min-w-[200px] hover:opacity-80 rounded-lg flex-1 bg-layer3'
 				style={{ borderColor: '#' + theme }}
-				onClick={() => setPreview({ ref: file.ref, type: file.type, name: file.name })}
+				onClick={() => setPreview(file)}
 			/>
 		);
 	return (
@@ -25,7 +27,7 @@ const FileContainer = ({ file, setPreview, theme, current }) => {
 			uuid={file.uuid}
 			key={file.ref}
 			className='rounded-lg px-4 py-3 flex gap-3 items-center justify-center flex-1'
-			onClick={() => setPreview({ ref: file.ref, type: file.type, name: file.name })}
+			onClick={() => setPreview(file)}
 			style={{
 				background: current ? '#' + theme : '#333',
 			}}
@@ -39,6 +41,7 @@ const FileContainer = ({ file, setPreview, theme, current }) => {
 };
 
 const DownloadOverlay = ({ setPreview, theme, preview }) => {
+	const { chatId } = useParams();
 	// Add onzoom with maxzoom of 1.5x
 	const onZoomIn = (e) => {
 		e.stopPropagation();
@@ -57,6 +60,21 @@ const DownloadOverlay = ({ setPreview, theme, preview }) => {
 		ref.style.transform = `scale(${scale})`;
 	};
 
+	const onDownload = async (e) => {
+		e.stopPropagation();
+		console.log(preview);
+		const blob = await downloadFile(chatId, preview.uuid, false);
+		const fr = new FileReader();
+		fr.readAsDataURL(blob);
+		fr.addEventListener('load', (e) => {
+			const anchor = document.createElement('a');
+			anchor.setAttribute('href', e.target.result);
+			anchor.target = '_blank';
+			anchor.download = preview.name;
+			anchor.click();
+		});
+	};
+
 	return (
 		<Overlay onClick={() => setPreview(null)}>
 			<div className='w-full h-full'>
@@ -70,9 +88,11 @@ const DownloadOverlay = ({ setPreview, theme, preview }) => {
 								<ZoomInIcon />
 							</Button>
 						</div>
-						<a href={preview.ref} target='_blank' download>
-							<Button style={{ background: '#' + theme }}>Download</Button>
-						</a>
+						{/* <a href={preview.ref} target='_blank' download> */}
+						<Button className='flex-[0]' style={{ background: '#' + theme }} onClick={onDownload}>
+							Download
+						</Button>
+						{/* </a> */}
 					</div>
 				</div>
 				<div className='w-max flex justify-center items-center flex-col m-auto text-text h-full'>
@@ -86,7 +106,7 @@ const DownloadOverlay = ({ setPreview, theme, preview }) => {
 							</div>
 						) : (
 							<div
-								className='flex flex-col gap-3 items-center font-medium text-xl'
+								className='flex flex-col gap-3 items-center font-medium text-xl bg-layer2 p-5 rounded-lg'
 								onClick={(e) => e.stopPropagation()}
 							>
 								<div>File name: {preview.name}</div>
@@ -187,7 +207,7 @@ const ChatMain = () => {
 			</div>
 			{showToBottom && (
 				<div
-					className='fixed bg-layer p-2 rounded-full right-1/2 translate-x-1/2 xs:right-[38%] bottom-20 xs:bottom-24 animate-bounce cursor-pointer shadow-xl'
+					className='absolute bg-gray-700 p-2 h-10 w-10 rounded-full left-[calc(50%_-_20px)] bottom-20 xs:bottom-24 animate-bounce cursor-pointer shadow-xl hover:bg-gray-800'
 					onClick={scrollToBottom}
 				>
 					<DownArrowIcon

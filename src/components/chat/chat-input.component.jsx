@@ -205,7 +205,7 @@ const ChatInput = () => {
 			</form>
 			{isDragged && (
 				<div
-					className='w-screen h-screen fixed top-0 left-0 bg-[#0009]'
+					className='w-screen h-screen fixed z-50 top-0 left-0 bg-[#0009]'
 					onClick={() => setIsDragged(false)}
 				></div>
 			)}

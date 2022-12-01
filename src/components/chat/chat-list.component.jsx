@@ -22,7 +22,7 @@ const ChatListItem = ({ id, members, selected, newUpdate, updated }) => {
 			} overflow-hidden md:w-full hover:bg-action shadow-xl`}
 		>
 			<Avatar members={members} />
-			<div className='flex xs:hidden md:flex flex-col gap-1 overflow-hidden'>
+			<div className='flex xs:hidden md:flex flex-col overflow-hidden'>
 				<div className='text-text font-medium inline truncate'>{names}</div>
 				<div className='text-[#fff9] inline truncate'>
 					<ReactTimeAgo date={date} timeStyle='mini-minute-now' />

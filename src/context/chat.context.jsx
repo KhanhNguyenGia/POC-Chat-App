@@ -4,6 +4,7 @@ export const ChatContext = createContext();
 
 export const CHAT_ACTION_TYPES = {
 	UPDATE_COLOR: 'CHAT/UPDATE_COLOR',
+	UPDATE_ALL: 'CHAT/UPDATE_ALL',
 };
 
 export const DEFAULT_CHAT = {
@@ -15,6 +16,8 @@ export const chatReducer = (state, action) => {
 	switch (type) {
 		case CHAT_ACTION_TYPES.UPDATE_COLOR:
 			return { ...state, theme: payload };
+		case CHAT_ACTION_TYPES.UPDATE_ALL:
+			return { ...state, ...payload };
 		default:
 			return state;
 	}
