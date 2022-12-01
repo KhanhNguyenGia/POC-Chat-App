@@ -62,7 +62,6 @@ const DownloadOverlay = ({ setPreview, theme, preview }) => {
 
 	const onDownload = async (e) => {
 		e.stopPropagation();
-		preview;
 		const blob = await downloadFile(chatId, preview.uuid, false);
 		const fr = new FileReader();
 		fr.readAsDataURL(blob);
