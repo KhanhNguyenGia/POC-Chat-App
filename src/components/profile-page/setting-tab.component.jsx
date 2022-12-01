@@ -43,7 +43,6 @@ const SettingTab = () => {
 	const onSubmit = (e) => {
 		try {
 			e.preventDefault();
-			// console.log(settings);
 			localStorage.setItem('settings', JSON.stringify(settings));
 			location.reload();
 		} catch (error) {

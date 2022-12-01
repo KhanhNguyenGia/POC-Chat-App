@@ -260,8 +260,8 @@ export const updateNotificationToken = async (chatId, uuid, state) => {
 export const getAllFiles = async (chatId) => {
 	const listRef = ref(storage, `/chats/${chatId}`);
 	const res = await listAll(listRef);
-	console.log(res.prefixes);
-	console.log(res.items);
+	// console.log(res.prefixes);
+	// console.log(res.items);
 };
 
 export const downloadFile = async (chatId, uuid, url = false) => {
