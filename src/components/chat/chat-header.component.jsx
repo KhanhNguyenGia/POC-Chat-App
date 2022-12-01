@@ -49,7 +49,7 @@ const MORE_LIST = [
 
 			useEffect(() => {
 				if (notificationTokens) {
-					setChecked(!!notificationTokens[user.uid].length);
+					setChecked(!!notificationTokens[user.uid]?.length);
 				}
 			}, [notificationTokens]);
 
